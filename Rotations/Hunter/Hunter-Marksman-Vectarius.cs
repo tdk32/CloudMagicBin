@@ -6,33 +6,86 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using CloudMagic.Helpers;
+using System.Threading;
 
 namespace CloudMagic.Rotation
 {
     public class MMHunterVectarius : CombatRoutine
     {
-		private int AimedShotCastTime
+		private NumericUpDown nudExhilarationPercentValue;
+		private NumericUpDown nudAspectoftheTurtlePercentValue;
+		private NumericUpDown nudFeignDeathPercentValue;
+		
+		private float AimedShotCastTime
         {
             get
             {
-                if (200 / (1 + (WoW.HastePercent / 100)) > 75)
-                {
-                    return 200 / (1 + (WoW.HastePercent / 100));
-                }
-                else
-                {
-                    return 75;
-                }
+                    return 200f / (1f + (WoW.HastePercent / 100f));
             }
         }
-	// DEF cds
+		private float GCD
+        {
+            get
+            {
+
+                    return (150f / (1f + (WoW.HastePercent / 100f)));
+
+            }
+        }
+private float FocusRegen
+{
+     get
+     {
+         return (10f* (1f + (WoW.HastePercent / 100f)));
+     }
+}	
+private float FocusTimetoMax
+{
+     get
+     {
+         return ((120f - WoW.Focus) /(10f* (1f + (WoW.HastePercent / 100f)))) *100f;
+     }
+}
+			//Pet Control	
+		private CheckBox HealPetBox;
+		// Items
+		private CheckBox KilJaedenBox;			
+
+
+		// DEF cds
 		private CheckBox ExhilarationBox;
 		private CheckBox FeignDeathBox;
-		private CheckBox AspectoftheTurtleBox;		
-		
+		private CheckBox AspectoftheTurtleBox;	
+
 		private CheckBox CounterShotBox;		
+		
 		//dps cds
-		private CheckBox KilJaedenBox;
+		private CheckBox TrueshotBox;
+		
+		
+
+		private static bool KilJaeden
+        {
+            get
+            {
+                var KilJaeden = ConfigFile.ReadValue("HunterBeastmastery", "KilJaeden").Trim();
+
+                return KilJaeden != "" && Convert.ToBoolean(KilJaeden);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "KilJaeden", value.ToString()); }
+        }	
+		
+        private static bool HealPet
+        {
+            get
+            {
+                var HealPet = ConfigFile.ReadValue("HunterBeastmastery", "HealPet").Trim();
+
+                return HealPet != "" && Convert.ToBoolean(HealPet);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "HealPet", value.ToString()); }
+        }
+		
 		
 
 		
@@ -46,6 +99,7 @@ namespace CloudMagic.Rotation
             }
             set { ConfigFile.WriteValue("HunterBeastmastery", "CounterShot", value.ToString()); }
         }	
+		
         private static bool Exhilaration
         {
             get
@@ -79,16 +133,18 @@ namespace CloudMagic.Rotation
             set { ConfigFile.WriteValue("HunterBeastmastery", "AspectoftheTurtle", value.ToString()); }
         }				
 		
-        private static bool KilJaeden
+        private static bool Trueshot
         {
             get
             {
-                var KilJaeden = ConfigFile.ReadValue("HunterBeastmastery", "KilJaeden").Trim();
+                var Trueshot = ConfigFile.ReadValue("HunterBeastmastery", "Trueshot").Trim();
 
-                return KilJaeden != "" && Convert.ToBoolean(KilJaeden);
+                return Trueshot != "" && Convert.ToBoolean(Trueshot);
             }
-            set { ConfigFile.WriteValue("HunterBeastmastery", "KilJaeden", value.ToString()); }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "Trueshot", value.ToString()); }
         }		
+		
+
 		
 
         
@@ -108,23 +164,60 @@ namespace CloudMagic.Rotation
 		
         public override void Initialize()
         {
-            
-            SettingsForm = new Form
+           
+			if (ConfigFile.ReadValue("Hunter", "AspectoftheTurtle Percent") == "")
             {
-                Text = "Marksman Hunter",
-                StartPosition = FormStartPosition.CenterScreen,
-                Width = 1000,
-                Height = 600,
-                ShowIcon = false
-            };
+                ConfigFile.WriteValue("Hunter", "AspectoftheTurtle Percent", "15");
+            }
+						if (ConfigFile.ReadValue("Hunter", "FeignDeath Percent") == "")
+            {
+                ConfigFile.WriteValue("Hunter", "FeignDeath Percent", "5");
+            }
+						if (ConfigFile.ReadValue("Hunter", "Exhilaration Percent") == "")
+            {
+                ConfigFile.WriteValue("Hunter", "Exhilaration Percent", "45");
+            }
+		   
+SettingsForm = new Form {Text = "Marksman Hunter", StartPosition = FormStartPosition.CenterScreen, Width = 400, Height = 500, ShowIcon = false};
 
-            
+            nudAspectoftheTurtlePercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "AspectoftheTurtle Percent"), 
+			Left = 215, 
+			Top = 172,
+			Size = new Size (40, 10)
+			}; 
+			SettingsForm.Controls.Add(nudAspectoftheTurtlePercentValue);
+			
+		
+
+            nudExhilarationPercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "Exhilaration Percent"), 
+			Left = 215, 
+			Top = 122,
+			Size = new Size (40, 10)
+			};
+			SettingsForm.Controls.Add(nudExhilarationPercentValue);
+			
+			
+		
+
+            nudFeignDeathPercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "FeignDeath Percent"), 
+			Left = 215, 
+			Top =147,
+			Size = new Size (40, 10)
+			};
+			SettingsForm.Controls.Add(nudFeignDeathPercentValue);
+			
+			
+
+
 			
 			var lblTitle = new Label
             {
                 Text =
-                    "MM Hunter by Vectarius",
-                Size = new Size(270, 13),
+                    "Marksman Hunter by Vectarius",
+                Size = new Size(270, 14),
                 Left = 61,
                 Top = 1
 	       };
@@ -133,38 +226,42 @@ namespace CloudMagic.Rotation
 			lblTitle.Font = myFont;
             SettingsForm.Controls.Add(lblTitle);
 			
+			
 
+			
 
-						var lblTextBox3 = new Label
+			
+			var lblTextBox3 = new Label
             {
                 Text =
                     "Cooldowns",
                 Size = new Size(200, 17),
                 Left = 70,
-                Top = 250
+                Top = 50
             };
 			lblTextBox3.ForeColor = Color.Black;
-			 SettingsForm.Controls.Add(lblTextBox3);			
-			
-			var lblKilJaedenBox = new Label
+			 SettingsForm.Controls.Add(lblTextBox3);
+
+			 
+			var lblTrueshotBox = new Label
             {
                 Text =
-                    "Kil'Jaeden's burning wish",
+                    "Trueshot",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 275
+                Top = 75
             };
 			
-			lblKilJaedenBox.ForeColor = Color.Black;
-            SettingsForm.Controls.Add(lblKilJaedenBox);			
- 
+			lblTrueshotBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblTrueshotBox);			
+           
 			var lblCounterShotBox = new Label
             {
                 Text =
                     "Counter Shot",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 300
+                Top = 100
             };
 			
 			lblCounterShotBox.ForeColor = Color.Black;
@@ -173,10 +270,10 @@ namespace CloudMagic.Rotation
 			var lblExhilarationBox = new Label
             {
                 Text =
-                    "Exhilaration",
+                    "Exhilaration @",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 325
+                Top = 125
             };
 			
 			lblExhilarationBox.ForeColor = Color.Black;
@@ -185,10 +282,10 @@ namespace CloudMagic.Rotation
 			var lblAspectoftheTurtleBox = new Label
             {
                 Text =
-                    "Aspect of the Turtle",
+                    "Aspect of the Turtle @",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 375
+                Top = 175
             };
 			
 			lblAspectoftheTurtleBox.ForeColor = Color.Black;
@@ -197,66 +294,151 @@ namespace CloudMagic.Rotation
 			var lblFeignDeathBox = new Label
             {
                 Text =
-                    "Feign Death",
+                    "Feign Death @",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 350
+                Top = 150
             };
 			
 			lblFeignDeathBox.ForeColor = Color.Black;
-            SettingsForm.Controls.Add(lblFeignDeathBox);	
+            SettingsForm.Controls.Add(lblFeignDeathBox);		
+
+
+
+					
+			 
+			var lblTextBox5 = new Label
+            {
+                Text =
+                    "Pet Control",
+                Size = new Size(200, 17),
+                Left = 70,
+                Top = 225
+            };
+			lblTextBox5.ForeColor = Color.Black;
+			 SettingsForm.Controls.Add(lblTextBox5);			 
+
+						var lblTextBox6 = new Label
+            {
+                Text =
+                    "Items",
+                Size = new Size(200, 17),
+                Left = 70,
+                Top = 275
+            };
+			lblTextBox6.ForeColor = Color.Black;
+			 SettingsForm.Controls.Add(lblTextBox6);
+			 
+
+
+
+	
+
+			var lblHealPetBox = new Label
+            {
+                Text =
+                    "Heal Pet",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 250
+            };
+			
+			lblHealPetBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblHealPetBox);	
+
+			var lblKilJaedenBox = new Label
+            {
+                Text =
+                    "Kil'Jaeden's Burning Wish",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 300
+            };
+			
+			lblKilJaedenBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblKilJaedenBox);			
+		   
+
+			
+			
+			
+			
+			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 375, Size = new Size(120, 31)};
+			
+			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 375, Size = new Size(120, 31)};
+			
  
 
+//items
+            KilJaedenBox = new CheckBox {Checked = KilJaeden, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 300};		
+            SettingsForm.Controls.Add(KilJaedenBox);
+//pet control			
+			HealPetBox = new CheckBox {Checked = HealPet, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 250};			
+            SettingsForm.Controls.Add(HealPetBox);
 			
-			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 425, Size = new Size(120, 31)};
-			
-			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 425, Size = new Size(120, 31)};
 			// Checkboxes
-			//dps cooldowns
-            CounterShotBox = new CheckBox {Checked = CounterShot, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};		
+            CounterShotBox = new CheckBox {Checked = CounterShot, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 100};		
             SettingsForm.Controls.Add(CounterShotBox);
-			ExhilarationBox = new CheckBox {Checked = Exhilaration, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 325};			
+			ExhilarationBox = new CheckBox {Checked = Exhilaration, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 125};			
             SettingsForm.Controls.Add(ExhilarationBox);
-			FeignDeathBox = new CheckBox {Checked = FeignDeath, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 350};
+			FeignDeathBox = new CheckBox {Checked = FeignDeath, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 150};
             SettingsForm.Controls.Add(FeignDeathBox);
 			
-			AspectoftheTurtleBox = new CheckBox {Checked = AspectoftheTurtle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 375};			
-			            SettingsForm.Controls.Add(AspectoftheTurtleBox);
-            KilJaedenBox = new CheckBox {Checked = KilJaeden, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 275};
-            SettingsForm.Controls.Add(KilJaedenBox);			
-
+			AspectoftheTurtleBox = new CheckBox {Checked = AspectoftheTurtle, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 175};			
+			            SettingsForm.Controls.Add(AspectoftheTurtleBox);		
 			//dps cooldowns
+            TrueshotBox = new CheckBox {Checked = Trueshot, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 75};
+            SettingsForm.Controls.Add(TrueshotBox);			
+
+			
+			
 			CounterShotBox.Checked = CounterShot;	
 			ExhilarationBox.Checked = Exhilaration;	
 			FeignDeathBox.Checked = FeignDeath;	
 			AspectoftheTurtleBox.Checked = AspectoftheTurtle;	
-
-			KilJaedenBox.Checked = KilJaeden;
+			
+			TrueshotBox.Checked = Trueshot;
 
 			
+
+		
+			
 			//cmdSave
-            KilJaedenBox.CheckedChanged += KilJaeden_Click;            
+
+			
+            KilJaedenBox.CheckedChanged += KilJaeden_Click;    
+            HealPetBox.CheckedChanged += HealPet_Click;				
+			
+            TrueshotBox.CheckedChanged += Trueshot_Click;    
             ExhilarationBox.CheckedChanged += Exhilaration_Click; 
             CounterShotBox.CheckedChanged += CounterShot_Click;
             FeignDeathBox.CheckedChanged += FeignDeath_Click;
-            AspectoftheTurtleBox.CheckedChanged += AspectoftheTurtle_Click;			
+            AspectoftheTurtleBox.CheckedChanged += AspectoftheTurtle_Click;	
+			
 			
 			cmdSave.Click += CmdSave_Click;
 			cmdReadme.Click += CmdReadme_Click;
-           
+ 
 			
 			SettingsForm.Controls.Add(cmdSave);
 			SettingsForm.Controls.Add(cmdReadme);
-
-			lblTextBox3.BringToFront();				
+		
+			lblTextBox5.BringToFront();		
+			lblTextBox6.BringToFront();				
 			lblTitle.BringToFront();
+
+			nudExhilarationPercentValue.BringToFront();
+			nudAspectoftheTurtlePercentValue.BringToFront();
+			nudFeignDeathPercentValue.BringToFront();		
 			
-            KilJaedenBox.BringToFront();		
+            KilJaedenBox.BringToFront();	
+            HealPetBox.BringToFront();				
+			
+            TrueshotBox.BringToFront();	
             CounterShotBox.BringToFront();	
             ExhilarationBox.BringToFront();
             FeignDeathBox.BringToFront();
-            AspectoftheTurtleBox.BringToFront();			
-			
+            AspectoftheTurtleBox.BringToFront();				
 			
 
 			
@@ -265,34 +447,47 @@ namespace CloudMagic.Rotation
 			
 			private void CmdSave_Click(object sender, EventArgs e)
         {
-            KilJaeden = KilJaedenBox.Checked;			
+
+
+            KilJaeden = KilJaedenBox.Checked;		
+            HealPet = HealPetBox.Checked;				
+			
+            Trueshot = TrueshotBox.Checked;		
             CounterShot = CounterShotBox.Checked;	
             Exhilaration = ExhilarationBox.Checked;
             FeignDeath = FeignDeathBox.Checked;
             AspectoftheTurtle = AspectoftheTurtleBox.Checked;			
 			
+            ConfigFile.WriteValue("Hunter", "AspectoftheTurtle Percent", nudAspectoftheTurtlePercentValue.Value.ToString());
+	        ConfigFile.WriteValue("Hunter", "FeignDeath Percent", nudFeignDeathPercentValue.Value.ToString());		
+            ConfigFile.WriteValue("Hunter", "Exhilaration Percent", nudExhilarationPercentValue.Value.ToString());			
 			
-
 			
-			
-			
-			
-            MessageBox.Show("Settings saved.", "CloudMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Settings saved.", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
         }
 		private void CmdReadme_Click(object sender, EventArgs e)
         {
             MessageBox.Show(
-                " no macros <.<",
-                "CloudMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                " make sure you make macros of Kill Command and Dire Frenzy/Beast /petattack",
+                "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-			// Checkboxes
-			//dpscooldown
-        private void KilJaeden_Click(object sender, EventArgs e)
+	
+
+		
+//items
+		private void KilJaeden_Click(object sender, EventArgs e)
         {
             KilJaeden = KilJaedenBox.Checked;
-        }        
-		
+        }			
+			
+//pet control			
+		private void HealPet_Click(object sender, EventArgs e)
+        {
+            HealPet = HealPetBox.Checked;
+        }	
+
+			
 		private void CounterShot_Click(object sender, EventArgs e)
         {
             CounterShot = CounterShotBox.Checked;
@@ -309,10 +504,13 @@ namespace CloudMagic.Rotation
         private void AspectoftheTurtle_Click(object sender, EventArgs e)
         {
             AspectoftheTurtle = AspectoftheTurtleBox.Checked;
-        }
-		
+        }			
+			//dpscooldown
+        private void Trueshot_Click(object sender, EventArgs e)
+        {
+            Trueshot = TrueshotBox.Checked;
+        }			
 
-	
 		
 		
         public override void Stop()
@@ -321,39 +519,65 @@ namespace CloudMagic.Rotation
 			
         }
 
+        private static bool lastNamePlate = true;
+        public void SelectRotation(int aoe, int cleave, int single)
+        {
+            int count = WoW.CountEnemyNPCsInRange;
+            if (!lastNamePlate)
+            {
+                combatRoutine.ChangeType(RotationType.SingleTarget);
+                lastNamePlate = true;
+            }
+            lastNamePlate = WoW.Nameplates;
+            if (count >= aoe)
+                combatRoutine.ChangeType(RotationType.AOE);
+            if (count == cleave)
+                combatRoutine.ChangeType(RotationType.SingleTargetCleave);
+            if (count <= single)
+                combatRoutine.ChangeType(RotationType.SingleTarget);
+
+        }       
+
         public override void Pulse()
         {
-            if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave)  // Do Single Target Stuff here
+			if (WoW.IsInCombat && Control.IsKeyLocked(Keys.Scroll) && !WoW.TargetIsPlayer && !WoW.IsMounted)
+			{	
+			SelectRotation(2, 100, 1 );
+			}
+		if (DetectKeyPress.GetKeyState(0x6A) < 0)
             {
-	
-                   /* if (WoW.CanCast("Death") && WoW.HealthPercent < 40 && Death && !WoW.IsSpellOnCooldown("Death") && WoW.HealthPercent != 0)
+                UseCooldowns = !UseCooldowns;
+                Thread.Sleep(150);
+            }			
+				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.IsMounted)
+                {			
+				     if (WoW.CanCast("FeignDeath") && WoW.Level >= 28&& WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "FeignDeath Percent") && FeignDeath && !WoW.IsSpellOnCooldown("FeignDeath") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Death");
+                        WoW.CastSpell("FeignDeath");
                         return;
                     }
-                    if (WoW.CanCast("Exhil") && WoW.HealthPercent < 30 && Exhil && !WoW.IsSpellOnCooldown("Exhil") && WoW.HealthPercent != 0)
+                    if (WoW.CanCast("Exhilaration") && WoW.Level >= 24 && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "Exhilaration Percent") && Exhilaration && !WoW.IsSpellOnCooldown("Exhilaration") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Exhil");
+                        WoW.CastSpell("Exhilaration");
                         return;
                     }	
-					if (WoW.CanCast("Turtle") && WoW.HealthPercent < 20 && Turtle && !WoW.IsSpellOnCooldown("Turtle") && WoW.HealthPercent != 0)
+					if (WoW.CanCast("AspectoftheTurtle") && WoW.Level >= 70&& WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "AspectoftheTurtle Percent") && AspectoftheTurtle && !WoW.IsSpellOnCooldown("AspectoftheTurtle") && WoW.HealthPercent != 0)
                     {
-                        WoW.CastSpell("Turtle");
+                        WoW.CastSpell("AspectoftheTurtle");
                         return;
                     }
-					/*if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
+					if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
 						{
 							WoW.CastSpell("Ancient Healing Potion");
 							return;
 						}
-					/*if (WoW.CanCast("Silkweave Bandage") && WoW.HealthPercent < 40 && WoW.PlayerHasBuff("Turtle") && !WoW.IsMoving && !WoW.PlayerHasDebuff("Bandaged") && WoW.HealthPercent != 0)
+					if (WoW.CanCast("Silkweave Bandage") && WoW.HealthPercent < 40 && WoW.PlayerHasBuff("Turtle") && !WoW.IsMoving && !WoW.PlayerHasDebuff("Bandaged"))
 						{
 							WoW.CastSpell("Silkweave Bandage");
 							return;
-						}*/
+						}
 											
-				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
-                {	
+	
 					if (WoW.CanCast("Counter Shot") 
 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting
@@ -404,7 +628,16 @@ namespace CloudMagic.Rotation
                     {
                         WoW.CastSpell("Blood Fury");
                         return;
-                    }	
+                    }
+				}					
+            if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave)  // Do Single Target Stuff here
+            {
+	
+                   
+											
+				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
+                {	
+
 					if (WoW.CanCast("Trueshot")
 						&& UseCooldowns
 						&& !WoW.PlayerIsChanneling
@@ -632,23 +865,12 @@ namespace CloudMagic.Rotation
                         return;
                     }					
 					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-				
-			} 
+						
+				} 
 			}
             if (combatRoutine.Type == RotationType.AOE)
             {
-				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.PlayerHasBuff("Trueshot"))
+				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.PlayerHasBuff("Trueshot") && !WoW.IsMounted)
 				
 				{
 					if (WoW.CanCast("Multi-Shot") 
@@ -676,7 +898,7 @@ namespace CloudMagic.Rotation
 					}	
 					
 				}
-				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerHasBuff("Trueshot"))
+				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.PlayerHasBuff("Trueshot") && !WoW.IsMounted)
                 {	
 					if (WoW.CanCast("Counter Shot") 
 						&& !WoW.PlayerIsChanneling
@@ -1070,14 +1292,16 @@ Spell,186387,Bursting Shot,D7
 Spell,147362,Counter Shot,D8
 Spell,198670,Piercing Shot,D1
 Spell,2643,Multi-Shot,D0
-Spell,109304,Exhil,V
+Spell,109304,Exhilaration,V
 Spell,193526,Trueshot,C
-Spell,186265,Turtle,G
-Spell,5384,Death,F
+Spell,186265,AspectoftheTurtle,G
+Spell,5384,FeignDeath,F
 Spell,144259,Kil'jaeden's Burning Wish,F4
 Spell,20572,Blood Fury,F3
 Spell,80483,Arcane Torrent,F3
 Spell,26297,Berserking,F3
+Spell,127834,Ancient Healing Potion,F5
+Spell,143940,Silkweave Bandage,None
 Aura,194386,Volley
 Aura,223138,Marking Targets
 Aura,185365,Hunters Mark
@@ -1086,6 +1310,7 @@ Aura,187131,Vulnerable
 Aura,193526,Trueshot
 Aura,2825,Bloodlust
 Aura,235712,Gyroscopic Stabilization
+Aura,186265,AspectoftheTurtle
 Item,5512,Healthstone
 Item,127834,Ancient Healing Potion
 Item,133940,Silkweave Bandage

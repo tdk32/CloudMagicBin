@@ -20,6 +20,8 @@ namespace CloudMagic.Rotation
 		private NumericUpDown nudExhilarationPercentValue;
 		private NumericUpDown nudAspectoftheTurtlePercentValue;
 		private NumericUpDown nudFeignDeathPercentValue;
+		private NumericUpDown nudCounterShotPercentValue;
+		private NumericUpDown nudIntimidationPercentValue;		
 
 
 		
@@ -49,6 +51,7 @@ private float FocusTimetoMax
 
 		//Pet Control	
 		private CheckBox HealPetBox;
+		private CheckBox IntimidationBox;
 		// Items
 		private CheckBox KilJaedenBox;			
 
@@ -86,6 +89,17 @@ private float FocusTimetoMax
             }
             set { ConfigFile.WriteValue("HunterBeastmastery", "HealPet", value.ToString()); }
         }
+		
+        private static bool Intimidation
+        {
+            get
+            {
+                var Intimidation = ConfigFile.ReadValue("HunterBeastmastery", "Intimidation").Trim();
+
+                return Intimidation != "" && Convert.ToBoolean(Intimidation);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "Intimidation", value.ToString()); }
+        }		
 		
 		
 
@@ -170,14 +184,22 @@ private float FocusTimetoMax
             {
                 ConfigFile.WriteValue("Hunter", "AspectoftheTurtle Percent", "15");
             }
-						if (ConfigFile.ReadValue("Hunter", "FeignDeath Percent") == "")
+			if (ConfigFile.ReadValue("Hunter", "FeignDeath Percent") == "")
             {
                 ConfigFile.WriteValue("Hunter", "FeignDeath Percent", "5");
             }
-						if (ConfigFile.ReadValue("Hunter", "Exhilaration Percent") == "")
+			if (ConfigFile.ReadValue("Hunter", "Exhilaration Percent") == "")
             {
                 ConfigFile.WriteValue("Hunter", "Exhilaration Percent", "45");
             }
+			if (ConfigFile.ReadValue("Hunter", "CounterShot Percent") == "")
+            {
+                ConfigFile.WriteValue("Hunter", "CounterShot Percent", "65");
+            }	
+			if (ConfigFile.ReadValue("Hunter", "Intimidation Percent") == "")
+            {
+                ConfigFile.WriteValue("Hunter", "Intimidation Percent", "80");
+            }			
 		   
 SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStartPosition.CenterScreen, Width = 400, Height = 500, ShowIcon = false};
 
@@ -209,6 +231,22 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 			Size = new Size (40, 10)
 			};
 			SettingsForm.Controls.Add(nudFeignDeathPercentValue);
+
+            nudCounterShotPercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "CounterShot Percent"), 
+			Left = 215, 
+			Top =100,
+			Size = new Size (40, 10)
+			};
+			SettingsForm.Controls.Add(nudCounterShotPercentValue);			
+
+            nudIntimidationPercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "Intimidation Percent"), 
+			Left = 215, 
+			Top =275,
+			Size = new Size (40, 10)
+			};
+			SettingsForm.Controls.Add(nudIntimidationPercentValue);					
 			
 			
 
@@ -259,7 +297,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 			var lblCounterShotBox = new Label
             {
                 Text =
-                    "Counter Shot",
+                    "Counter Shot @",
                 Size = new Size(270, 15),
                 Left = 100,
                 Top = 100
@@ -325,7 +363,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
                     "Items",
                 Size = new Size(200, 17),
                 Left = 70,
-                Top = 275
+                Top = 300
             };
 			lblTextBox6.ForeColor = Color.Black;
 			 SettingsForm.Controls.Add(lblTextBox6);
@@ -346,6 +384,18 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 			
 			lblHealPetBox.ForeColor = Color.Black;
             SettingsForm.Controls.Add(lblHealPetBox);	
+			
+			var lblIntimidationBox = new Label
+            {
+                Text =
+                    "Intimidation @",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 275
+            };
+			
+			lblIntimidationBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblIntimidationBox);				
 
 			var lblKilJaedenBox = new Label
             {
@@ -353,7 +403,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
                     "Kil'Jaeden's Burning Wish",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 300
+                Top = 325
             };
 			
 			lblKilJaedenBox.ForeColor = Color.Black;
@@ -371,11 +421,13 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
  
 
 //items
-            KilJaedenBox = new CheckBox {Checked = KilJaeden, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 300};		
+            KilJaedenBox = new CheckBox {Checked = KilJaeden, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 325};		
             SettingsForm.Controls.Add(KilJaedenBox);
 //pet control			
-			HealPetBox = new CheckBox {Checked = HealPet, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 250};			
+			HealPetBox = new CheckBox {Checked = HealPet, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 250};		
+			IntimidationBox = new CheckBox {Checked = Intimidation, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 275};				
             SettingsForm.Controls.Add(HealPetBox);
+            SettingsForm.Controls.Add(IntimidationBox);			
 			
 			// Checkboxes
             CounterShotBox = new CheckBox {Checked = CounterShot, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 100};		
@@ -408,7 +460,8 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 
 			
             KilJaedenBox.CheckedChanged += KilJaeden_Click;    
-            HealPetBox.CheckedChanged += HealPet_Click;				
+            HealPetBox.CheckedChanged += HealPet_Click;		
+            IntimidationBox.CheckedChanged += Intimidation_Click;				
 			
             AspectoftheWildBox.CheckedChanged += AspectoftheWild_Click;    
             ExhilarationBox.CheckedChanged += Exhilaration_Click; 
@@ -433,7 +486,8 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 			nudFeignDeathPercentValue.BringToFront();		
 			
             KilJaedenBox.BringToFront();	
-            HealPetBox.BringToFront();				
+            HealPetBox.BringToFront();	
+            IntimidationBox.BringToFront();				
 			
             AspectoftheWildBox.BringToFront();	
             CounterShotBox.BringToFront();	
@@ -451,7 +505,8 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 
 
             KilJaeden = KilJaedenBox.Checked;		
-            HealPet = HealPetBox.Checked;				
+            HealPet = HealPetBox.Checked;			
+            Intimidation = IntimidationBox.Checked;				
 			
             AspectoftheWild = AspectoftheWildBox.Checked;		
             CounterShot = CounterShotBox.Checked;	
@@ -464,14 +519,14 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
             ConfigFile.WriteValue("Hunter", "Exhilaration Percent", nudExhilarationPercentValue.Value.ToString());			
 			
 			
-            MessageBox.Show("Settings saved.", "CloudMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Settings saved.", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
         }
 		private void CmdReadme_Click(object sender, EventArgs e)
         {
             MessageBox.Show(
                 " make sure you make macros of Kill Command and Dire Frenzy/Beast /petattack",
-                "CloudMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 	
 
@@ -487,6 +542,10 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
         {
             HealPet = HealPetBox.Checked;
         }	
+		private void Intimidation_Click(object sender, EventArgs e)
+        {
+            Intimidation = IntimidationBox.Checked;
+        }			
 
 			
 		private void CounterShot_Click(object sender, EventArgs e)
@@ -551,39 +610,29 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
                 UseCooldowns = !UseCooldowns;
                 Thread.Sleep(150);
             }			
-				if(WoW.IsInCombat && !WoW.HasTarget)
+				/*if(WoW.IsInCombat && !WoW.HasTarget)
 				{
 				WoW.KeyPressRelease(WoW.Keys.Tab);
 				return;
-				}
-				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
+				}*/
+				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.IsMounted)
 				{
-Log.Write("focus * cdremain KC >300 : " + ((FocusRegen*WoW.SpellCooldownTimeRemaining("Kill Command")) > 300));
-				     if (WoW.CanCast("FeignDeath") && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "FeignDeath Percent") && FeignDeath && !WoW.IsSpellOnCooldown("FeignDeath") && WoW.HealthPercent != 0)
+				     if (WoW.CanCast("FeignDeath") && WoW.Level >= 28&& WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "FeignDeath Percent") && FeignDeath && !WoW.IsSpellOnCooldown("FeignDeath") && WoW.HealthPercent != 0)
                     {
                         WoW.CastSpell("FeignDeath");
                         return;
                     }
-                    if (WoW.CanCast("Exhilaration") && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "Exhilaration Percent") && Exhilaration && !WoW.IsSpellOnCooldown("Exhilaration") && WoW.HealthPercent != 0)
+                    if (WoW.CanCast("Exhilaration") && WoW.Level >= 24 && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "Exhilaration Percent") && Exhilaration && !WoW.IsSpellOnCooldown("Exhilaration") && WoW.HealthPercent != 0)
                     {
                         WoW.CastSpell("Exhilaration");
                         return;
                     }	
-					if (WoW.CanCast("AspectoftheTurtle") && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "AspectoftheTurtle Percent") && AspectoftheTurtle && !WoW.IsSpellOnCooldown("AspectoftheTurtle") && WoW.HealthPercent != 0)
+					if (WoW.CanCast("AspectoftheTurtle") && WoW.Level >= 70&& WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "AspectoftheTurtle Percent") && AspectoftheTurtle && !WoW.IsSpellOnCooldown("AspectoftheTurtle") && WoW.HealthPercent != 0)
                     {
                         WoW.CastSpell("AspectoftheTurtle");
                         return;
                     }
-					if (WoW.CanCast("Ancient Healing Potion") && WoW.HealthPercent < 20 && !WoW.IsSpellOnCooldown("Ancient Healing Potion") && WoW.HealthPercent != 0)
-						{
-							WoW.CastSpell("Ancient Healing Potion");
-							return;
-						}
-					if (WoW.CanCast("Silkweave Bandage") && WoW.HealthPercent < 40 && WoW.PlayerHasBuff("Turtle") && !WoW.IsMoving && !WoW.PlayerHasDebuff("Bandaged"))
-						{
-							WoW.CastSpell("Silkweave Bandage");
-							return;
-						}	
+	
 					
                     if (!WoW.HasPet && WoW.CanCast("Wolf"))
 					{
@@ -597,7 +646,7 @@ Log.Write("focus * cdremain KC >300 : " + ((FocusRegen*WoW.SpellCooldownTimeRema
 					}
 				
 					if (WoW.PetHealthPercent <= 90 
-						&& !WoW.PetHasBuff("Heal Pet")
+						&& WoW.Level >= 14&& !WoW.PetHasBuff("Heal Pet")
 						&& HealPet						
 						&& WoW.CanCast("Revive Pet") 
 						&& !WoW.IsMoving)
@@ -613,11 +662,11 @@ Log.Write("focus * cdremain KC >300 : " + ((FocusRegen*WoW.SpellCooldownTimeRema
 						WoW.CastSpell("Revive Pet") ;
 						return;
 					}	
-					                    if (WoW.TargetIsCasting)
+					if (WoW.TargetIsCasting)
                     {
-                        if (WoW.CanCast("Counter Shot") 
+                        if (WoW.CanCast("Counter Shot") && WoW.Level >= 32
 							&& WoW.TargetIsCastingAndSpellIsInterruptible 
-							&& WoW.TargetPercentCast >= 60 
+							&& WoW.TargetPercentCast >= ConfigFile.ReadValue<int>("Hunter", "CounterShot Percent") 
 							&& !WoW.IsSpellOnCooldown("Counter Shot") 
 							&& !WoW.PlayerIsChanneling 
 							&& !WoW.WasLastCasted("Counter Shot"))
@@ -625,149 +674,18 @@ Log.Write("focus * cdremain KC >300 : " + ((FocusRegen*WoW.SpellCooldownTimeRema
                             WoW.CastSpell("Counter Shot");						
                             return;
                         }	
+                        if (WoW.CanCast("Intimidation") && WoW.Level >= 32
+							&& Intimidation
+							&& WoW.TargetIsCastingAndSpellIsInterruptible 
+							&& WoW.TargetPercentCast <= ConfigFile.ReadValue<int>("Hunter", "Intimidation Percent") 
+							&& !WoW.IsSpellOnCooldown("Intimidation") 
+							&& !WoW.PlayerIsChanneling 
+							&& !WoW.WasLastCasted("Intimidation"))
+                        {
+                            WoW.CastSpell("Intimidation");						
+                            return;
+                        }						
 					}
-				}
-			if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave)  
-            {
-
-			if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
-                {	
-			
-					if (WoW.CanCast("A Murder of Crows") 
-						&& WoW.Talent(6) == 1
-						&& WoW.Focus >= 25
-						&& WoW.IsSpellInRange("Cobra Shot")
-						&& !WoW.IsSpellOnCooldown("A Murder of Crows")	)
-                    {
-                        WoW.CastSpell("A Murder of Crows");
-                        return;
-                    }
-	
-					if (WoW.CanCast("Volley") 
-						&& !WoW.PlayerHasBuff("Volley")
-						&& WoW.Talent(6) == 3)
-                    {
-                        WoW.CastSpell("Volley");
-                        return;
-                    }
-					if (WoW.CanCast("Arcane Torrent") 
-						
-						&& !WoW.IsSpellOnCooldown ("Arcane Torrent")
-						&& WoW.PlayerRace == "BloodElf"
-						&& WoW.Focus <= 85)
-                    {
-                        WoW.CastSpell("Arcane Torrent");
-                        return;
-                    }
-					if (WoW.CanCast("Berserking") 
-						
-						&& !WoW.IsSpellOnCooldown ("Berserking")
-						&& WoW.PlayerRace == "Troll")
-                    {
-                        WoW.CastSpell("Berserking");
-                        return;
-                    }					
-					if (WoW.CanCast("Blood Fury") 
-						
-						&& !WoW.IsSpellOnCooldown ("Blood Fury")
-						&& WoW.PlayerRace == "Orc")
-                    {
-                        WoW.CastSpell("Blood Fury");
-                        return;
-                    }	
-					if (WoW.CanCast("Chimaera Shot") 
-						&& WoW.Focus <90
-						&& WoW.IsSpellOnCooldown("Dire Frenzy")
-						&& WoW.IsSpellOnCooldown("Kill Command")						
-						&& WoW.CanCast("Chimaera Shot")
-						&& WoW.Talent(2) == 3)
-						{
-                        WoW.CastSpell("Chimaera Shot");
-                        return;
-						}					
-					if (WoW.CanCast("Kil'jaeden's Burning Wish") && KilJaeden && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish") && !WoW.IsSpellOnCooldown("Kil'jaeden's Burning Wish"))  
-                    {
-                        WoW.CastSpell("Kil'jaeden's Burning Wish");
-                        return;
-                    }					
-//	stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14	
-					if (WoW.CanCast("Stampede") && WoW.Talent(7) == 1 && WoW.IsSpellInRange("Cobra Shot") && ((WoW.PlayerHasBuff("Bestial Wrath")) || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") <=2))						
-						&& !WoW.PlayerHasBuff("AspectoftheTurtle")
-						&& !WoW.IsSpellOnCooldown("Stampede")) 
-                    {
-                        WoW.CastSpell("Stampede");
-
-                        return;
-                    }				
-//dire_beast,if=cooldown.bestial_wrath.remains>3	
-					if (WoW.CanCast("Dire Beast") && WoW.Talent(2) != 2 && !WoW.IsSpellOnCooldown ("Dire Beast") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") > 300 && WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Dire Beast");
-                        return;
-                    }									
-//dire_frenzy,if=(cooldown.bestial_wrath.remains>6&(!equipped.the_mantle_of_command|pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2))
-					if (WoW.CanCast("Dire Frenzy") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >600 &&(WoW.Legendary(1) != 3 || WoW.PetBuffTimeRemaining("Dire Frenzy") <= 70)) && WoW.Talent(2) == 2 && WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Dire Frenzy");
-                        return;
-                    }
-//|(charges>=2&focus.deficit>=25+talent.dire_stable.enabled*12)|target.time_to_die<9
-					if (WoW.CanCast("Dire Frenzy") && WoW.PlayerSpellCharges("Dire Frenzy") >=2 && WoW.Focus <= 95 && WoW.Talent(2) == 2 && WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Dire Frenzy");
-                        return;
-                    }
-					if (WoW.CanCast("Dire Frenzy") && WoW.PlayerSpellCharges("Dire Frenzy") >=2 && WoW.Focus <= 83 && WoW.Talent(2) == 2 && WoW.Talent(1) == 3 && WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Dire Frenzy");
-                        return;
-                    }	
-//aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12	
-					if (WoW.CanCast("Aspect of the Wild")&& UseCooldowns && WoW.PlayerHasBuff("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Aspect of the Wild");
-                        return;
-                    }	
-//titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)		
-					if (WoW.CanCast("Titan's Thunder") && (WoW.Talent(2) == 2 || (WoW.Talent(2) != 2 && WoW.SpellCooldownTimeRemaining("Dire Beast") > 300) || (WoW.Talent(2) != 2 && WoW.PlayerHasBuff("Bestial Wrath") && WoW.PlayerHasBuff ("Dire Beast"))) && WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Titan's Thunder");
-                        return;
-                    }	
-//bestial_wrath
-					if (WoW.CanCast("Bestial Wrath") &&  WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Bestial Wrath");
-                        return;
-                    }
-//kill_command
-					if (WoW.CanCast("Kill Command") &&  WoW.IsSpellInRange("Cobra Shot"))
-                    {
-                        WoW.CastSpell("Kill Command");
-                        return;
-                    }					
-//cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains					
-					if (WoW.CanCast("Cobra Shot") && WoW.Focus > 32&& (WoW.SpellCooldownTimeRemaining("Kill Command") > FocusTimetoMax && WoW.SpellCooldownTimeRemaining("Bestial Wrath") > FocusTimetoMax) 
-						
-						&& WoW.IsSpellInRange("Cobra Shot"))
-                    {	
-                        WoW.CastSpell("Cobra Shot");
-                        return;
-                    }
-					if (WoW.CanCast("Cobra Shot") && WoW.Focus > 32 && WoW.PlayerHasBuff("Bestial Wrath") && ((FocusRegen*WoW.SpellCooldownTimeRemaining("Kill Command")) > 300) && WoW.IsSpellInRange("Cobra Shot"))
-                    {				
-                        WoW.CastSpell("Cobra Shot");
-                        return;
-                    }
-                }
-            }
-
-            if (combatRoutine.Type == RotationType.AOE)
-            {
-	
-				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
-                {
-																					
 					if (WoW.CanCast("Kil'jaeden's Burning Wish") && KilJaeden && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish") && !WoW.IsSpellOnCooldown("Kil'jaeden's Burning Wish"))  
                     {
                         WoW.CastSpell("Kil'jaeden's Burning Wish");
@@ -802,15 +720,6 @@ Log.Write("focus * cdremain KC >300 : " + ((FocusRegen*WoW.SpellCooldownTimeRema
                     {
                         WoW.CastSpell("Blood Fury");
                         return;
-                    }					
-                    if (WoW.CanCast("Barrage") 
-						&& WoW.Talent(6) == 2 
-						&& !WoW.IsSpellOnCooldown("Barrage") 
-						&& WoW.IsSpellInRange("Cobra Shot") 
-						&& WoW.Focus >= 60)
-                    {
-                        WoW.CastSpell("Barrage");
-                        return;
                     }	
 					if (WoW.CanCast("Chimaera Shot") 
 						&& WoW.Focus <90
@@ -822,33 +731,22 @@ Log.Write("focus * cdremain KC >300 : " + ((FocusRegen*WoW.SpellCooldownTimeRema
                         WoW.CastSpell("Chimaera Shot");
                         return;
 						}					
+				}
+			if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave)  
+            {
+
+			if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && !WoW.IsMounted)
+                {	
+			
 					if (WoW.CanCast("A Murder of Crows") 
 						&& WoW.Talent(6) == 1
-						&& WoW.Focus >= 46-FocusRegen 
-						&& WoW.PetBuffTimeRemaining("Beast Cleave") > GCD
+						&& WoW.Focus >= 25
 						&& WoW.IsSpellInRange("Cobra Shot")
 						&& !WoW.IsSpellOnCooldown("A Murder of Crows")	)
                     {
                         WoW.CastSpell("A Murder of Crows");
                         return;
                     }
-					if (WoW.CanCast("Multi-Shot") 
-						&& WoW.Focus >= 40
-						&& !WoW.PetHasBuff("Beast Cleave") 
-						&& WoW.IsSpellInRange("Multi-Shot"))
-                    {
-                        WoW.CastSpell("Multi-Shot");                        
-                        return;
-                    }
-                    if (WoW.CanCast("Multi-Shot") 
-						&& WoW.Focus >= 40 
-						&& WoW.PetHasBuff("Beast Cleave") 
-						&& WoW.PetBuffTimeRemaining("Beast Cleave") <= 70
-						&& WoW.IsSpellInRange("Multi-Shot"))
-                    {
-                        WoW.CastSpell("Multi-Shot");                        
-                        return;
-                    }					
 //	stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14	
 					if (WoW.CanCast("Stampede") && WoW.Talent(7) == 1 && WoW.IsSpellInRange("Cobra Shot") && ((WoW.PlayerHasBuff("Bestial Wrath")) || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") <=2))						
 						&& !WoW.PlayerHasBuff("AspectoftheTurtle")
@@ -859,7 +757,7 @@ Log.Write("focus * cdremain KC >300 : " + ((FocusRegen*WoW.SpellCooldownTimeRema
                         return;
                     }				
 //dire_beast,if=cooldown.bestial_wrath.remains>3	
-					if (WoW.CanCast("Dire Beast") && WoW.Talent(2) != 2 && !WoW.IsSpellOnCooldown ("Dire Beast") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") > 300 && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Dire Beast") && WoW.Level >= 12&& WoW.Talent(2) != 2 && !WoW.IsSpellOnCooldown ("Dire Beast") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") > 300 && WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Dire Beast");
                         return;
@@ -882,42 +780,172 @@ Log.Write("focus * cdremain KC >300 : " + ((FocusRegen*WoW.SpellCooldownTimeRema
                         return;
                     }	
 //aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12	
-					if (WoW.CanCast("Aspect of the Wild") && UseCooldowns && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && WoW.PlayerHasBuff("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Aspect of the Wild")&& WoW.Level >= 26&& WoW.HasBossTarget && WoW.PlayerHasBuff("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Aspect of the Wild");
                         return;
                     }	
 //titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)		
-					if (WoW.CanCast("Titan's Thunder") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && (WoW.Talent(2) == 2 || (WoW.Talent(2) != 2 && WoW.SpellCooldownTimeRemaining("Dire Beast") > 300) || (WoW.Talent(2) != 2 && WoW.PlayerHasBuff("Bestial Wrath") && WoW.PlayerHasBuff ("Dire Beast"))) && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Titan's Thunder") && WoW.Level >= 110&& (WoW.Talent(2) == 2 || (WoW.Talent(2) != 2 && WoW.SpellCooldownTimeRemaining("Dire Beast") > 300) || (WoW.Talent(2) != 2 && WoW.PlayerHasBuff("Bestial Wrath") && WoW.PlayerHasBuff ("Dire Beast"))) && WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Titan's Thunder");
                         return;
                     }	
 //bestial_wrath
-					if (WoW.CanCast("Bestial Wrath") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD  &&  WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Bestial Wrath") && WoW.Level >= 40&&  WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Bestial Wrath");
                         return;
                     }
 //kill_command
-					if (WoW.CanCast("Kill Command") && WoW.Focus >= 70-FocusRegen && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD &&  WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Kill Command") && (WoW.Focus >= 30 || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 25)) && WoW.Level >= 10&&  WoW.IsSpellInRange("Cobra Shot"))
+                    {
+                        WoW.CastSpell("Kill Command");
+                        return;
+                    }
+					if (WoW.CanCast("Cobra Shot") && WoW.Level <= 39 && WoW.Focus > 40  
+						
+						&& WoW.IsSpellInRange("Cobra Shot"))
+                    {	
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }					
+//cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains					
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus > 32 || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 25))&& (WoW.SpellCooldownTimeRemaining("Kill Command") > (FocusTimetoMax)) && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") > (FocusTimetoMax))
+						
+						&& WoW.IsSpellInRange("Cobra Shot"))
+                    {			
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus > 32 || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 25))&& WoW.PlayerHasBuff("Bestial Wrath") && ((FocusRegen*WoW.SpellCooldownTimeRemaining("Kill Command")) > 300) && WoW.IsSpellInRange("Cobra Shot"))
+                    {					
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }
+                }
+            }
+
+            if (combatRoutine.Type == RotationType.AOE)
+            {
+	
+				if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
+                {
+																					
+				
+                    if (WoW.CanCast("Barrage") 
+						&& WoW.Talent(6) == 2 
+						&& !WoW.IsSpellOnCooldown("Barrage") 
+						&& WoW.IsSpellInRange("Cobra Shot") 
+						&& WoW.Focus >= 60)
+                    {
+                        WoW.CastSpell("Barrage");
+                        return;
+                    }	
+					
+					if (WoW.CanCast("A Murder of Crows") 
+						&& WoW.Talent(6) == 1
+						&& WoW.Focus >= 46-FocusRegen 
+						&& WoW.PetBuffTimeRemaining("Beast Cleave") > GCD
+						&& WoW.IsSpellInRange("Cobra Shot")
+						&& !WoW.IsSpellOnCooldown("A Murder of Crows")	)
+                    {
+                        WoW.CastSpell("A Murder of Crows");
+                        return;
+                    }
+					if (WoW.CanCast("Multi-Shot") && WoW.Level >= 50
+						&& (WoW.Focus >= 40 || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 34))
+						&& !WoW.PetHasBuff("Beast Cleave") 
+						&& WoW.IsSpellInRange("Multi-Shot"))
+                    {
+                        WoW.CastSpell("Multi-Shot");                        
+                        return;
+                    }
+                    if (WoW.CanCast("Multi-Shot") && WoW.Level >= 50
+						&& (WoW.Focus >= 40 || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 34)) 
+						&& WoW.PetHasBuff("Beast Cleave") 
+						&& WoW.PetBuffTimeRemaining("Beast Cleave") <= 70
+						&& WoW.IsSpellInRange("Multi-Shot"))
+                    {
+                        WoW.CastSpell("Multi-Shot");                        
+                        return;
+                    }					
+//	stampede,if=buff.bloodlust.up|buff.bestial_wrath.up|cooldown.bestial_wrath.remains<=2|target.time_to_die<=14	
+					if (WoW.CanCast("Stampede") && WoW.Talent(7) == 1 && WoW.IsSpellInRange("Cobra Shot") && ((WoW.PlayerHasBuff("Bestial Wrath")) || (WoW.SpellCooldownTimeRemaining("Bestial Wrath") <=2))						
+						&& !WoW.PlayerHasBuff("AspectoftheTurtle")
+						&& !WoW.IsSpellOnCooldown("Stampede")) 
+                    {
+                        WoW.CastSpell("Stampede");
+
+                        return;
+                    }				
+//dire_beast,if=cooldown.bestial_wrath.remains>3	
+					if (WoW.CanCast("Dire Beast") && WoW.Level >= 12&& WoW.Talent(2) != 2 && !WoW.IsSpellOnCooldown ("Dire Beast") && WoW.SpellCooldownTimeRemaining("Bestial Wrath") > 300 && WoW.IsSpellInRange("Cobra Shot"))
+                    {
+                        WoW.CastSpell("Dire Beast");
+                        return;
+                    }									
+//dire_frenzy,if=(cooldown.bestial_wrath.remains>6&(!equipped.the_mantle_of_command|pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2))
+					if (WoW.CanCast("Dire Frenzy") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >600 &&(WoW.Legendary(1) != 3 || WoW.PetBuffTimeRemaining("Dire Frenzy") <= 70)) && WoW.Talent(2) == 2 && WoW.IsSpellInRange("Cobra Shot"))
+                    {
+                        WoW.CastSpell("Dire Frenzy");
+                        return;
+                    }
+//|(charges>=2&focus.deficit>=25+talent.dire_stable.enabled*12)|target.time_to_die<9
+					if (WoW.CanCast("Dire Frenzy") && WoW.PlayerSpellCharges("Dire Frenzy") >=2 && WoW.Focus <= 95 && WoW.Talent(2) == 2 && WoW.IsSpellInRange("Cobra Shot"))
+                    {
+                        WoW.CastSpell("Dire Frenzy");
+                        return;
+                    }
+					if (WoW.CanCast("Dire Frenzy") && WoW.PlayerSpellCharges("Dire Frenzy") >=2 && WoW.Focus <= 83 && WoW.Talent(2) == 2 && WoW.Talent(1) == 3 && WoW.IsSpellInRange("Cobra Shot"))
+                    {
+                        WoW.CastSpell("Dire Frenzy");
+                        return;
+                    }	
+//aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12	
+					if (WoW.CanCast("Aspect of the Wild") && WoW.Level >= 26&& WoW.HasBossTarget && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && WoW.PlayerHasBuff("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot"))
+                    {
+                        WoW.CastSpell("Aspect of the Wild");
+                        return;
+                    }	
+//titans_thunder,if=talent.dire_frenzy.enabled|cooldown.dire_beast.remains>=3|(buff.bestial_wrath.up&pet.dire_beast.active)		
+					if (WoW.CanCast("Titan's Thunder") && WoW.Level >= 110&& WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && (WoW.Talent(2) == 2 || (WoW.Talent(2) != 2 && WoW.SpellCooldownTimeRemaining("Dire Beast") > 300) || (WoW.Talent(2) != 2 && WoW.PlayerHasBuff("Bestial Wrath") && WoW.PlayerHasBuff ("Dire Beast"))) && WoW.IsSpellInRange("Cobra Shot"))
+                    {
+                        WoW.CastSpell("Titan's Thunder");
+                        return;
+                    }	
+//bestial_wrath
+					if (WoW.CanCast("Bestial Wrath") && WoW.Level >= 40&& WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD  &&  WoW.IsSpellInRange("Cobra Shot"))
+                    {
+                        WoW.CastSpell("Bestial Wrath");
+                        return;
+                    }
+//kill_command
+					if (WoW.CanCast("Kill Command") && WoW.Level >= 10&& ((WoW.Focus >= 70-FocusRegen) || (WoW.PlayerHasBuff("Roar of the Seven Lions") && (WoW.Focus >= 59-FocusRegen))) && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD &&  WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Kill Command");
                         return;
                     }					
 //cobra_shot,if=(cooldown.kill_command.remains>focus.time_to_max&cooldown.bestial_wrath.remains>focus.time_to_max)|(buff.bestial_wrath.up&focus.regen*cooldown.kill_command.remains>30)|target.time_to_die<cooldown.kill_command.remains					
-					if (WoW.CanCast("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && WoW.Focus > 72-FocusRegen && (WoW.SpellCooldownTimeRemaining("Kill Command") > FocusTimetoMax && WoW.SpellCooldownTimeRemaining("Bestial Wrath") > FocusTimetoMax) 
+					if (WoW.CanCast("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && ((WoW.Focus > 72-FocusRegen) || (WoW.PlayerHasBuff("Roar of the Seven Lions") && (WoW.Focus >= 59-FocusRegen)))&& (WoW.SpellCooldownTimeRemaining("Kill Command") > FocusTimetoMax && WoW.SpellCooldownTimeRemaining("Bestial Wrath") > FocusTimetoMax) 
 						
 						&& WoW.IsSpellInRange("Cobra Shot"))
                     {	
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }
-					if (WoW.CanCast("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && WoW.Focus > 72-FocusRegen && WoW.PlayerHasBuff("Bestial Wrath") && ((FocusRegen*WoW.SpellCooldownTimeRemaining("Kill Command")) > 300) && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && ((WoW.Focus > 72-FocusRegen) || (WoW.PlayerHasBuff("Roar of the Seven Lions") && (WoW.Focus >= 59-FocusRegen))) && WoW.PlayerHasBuff("Bestial Wrath") && ((FocusRegen*WoW.SpellCooldownTimeRemaining("Kill Command")) > 300) && WoW.IsSpellInRange("Cobra Shot"))
                     {				
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }
+					if (WoW.CanCast("Cobra Shot") && WoW.Level <= 39 && WoW.Focus > 40  
+						
+						&& WoW.IsSpellInRange("Cobra Shot"))
+                    {	
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }						
 
 				}
             }
@@ -963,6 +991,7 @@ Spell,80483,Arcane Torrent,F3
 Spell,53209,Chimaera Shot,F8
 Spell,26297,Berserking,F9
 Spell,201430,Stampede,C
+Spell,24394,Intimidation,none
 Aura,217200,Dire Frenzy
 Aura,186265,AspectoftheTurtle
 Aura,136,Heal Pet
@@ -979,6 +1008,7 @@ Aura,19574,Bestial Wrath
 Aura,118455,Beast Cleave
 Aura,193530,Aspect of the Wild
 Aura,194386,Volley
+Aura,137080,Roar of the Seven Lions
 Item,144259,Kil'jaeden's Burning Wish
 
 */

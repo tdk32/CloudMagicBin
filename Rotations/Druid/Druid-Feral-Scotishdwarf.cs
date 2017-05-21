@@ -930,7 +930,7 @@ namespace CloudMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Dani
 AddonName=HideOrderHallBar
-WoWVersion=Legion - 70000
+WoWVersion=Legion - 72000
 [SpellBook.db]
 Spell,768,Cat Form,D7
 Spell,1079,Rip,F8

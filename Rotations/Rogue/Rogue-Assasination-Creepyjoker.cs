@@ -202,7 +202,7 @@ namespace CloudMagic.Rotation
 						WoW.CastSpell("Rupture");
 						return;
 					}
-					if (UseCooldowns && WoW.CanCast("Berserk") && !WoW.IsSpellOnCooldown("Berserk") )
+					if (UseCooldowns && WoW.CanCast("Berserk") && !WoW.IsSpellOnCooldown("Berserk") && WoW.TargetHasDebuff ("Vendetta") && WoW.PlayerRace == "Troll")
                     {
                         WoW.CastSpell("Berserk");
                         return;

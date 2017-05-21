@@ -41,9 +41,6 @@ namespace CloudMagic.Rotation
         //SW HP Percent Selection
         private NumericUpDown SWHPPercentValue;
         //
-		private CheckBox Protintbox;
-		private CheckBox Furyintbox;
-		private CheckBox Armsintbox;
 		private static Image LowGow
         {
             get
@@ -75,37 +72,7 @@ namespace CloudMagic.Rotation
         }
 
         
-		private static bool Protspec
-        {
-            get
-            {
-                var Protspec = ConfigFile.ReadValue("ProtectionLesion", "Protspec").Trim();
-
-                return Protspec != "" && Convert.ToBoolean(Protspec);
-            }
-            set { ConfigFile.WriteValue("ProtectionLesion", "Protspec", value.ToString()); }
-        }
-		private static bool Furyspec
-        {
-            get
-            {
-                var Furyspec = ConfigFile.ReadValue("ProtectionLesion", "Furyspec").Trim();
-
-                return Furyspec != "" && Convert.ToBoolean(Furyspec);
-            }
-            set { ConfigFile.WriteValue("ProtectionLesion", "Furyspec", value.ToString()); }
-        }
-		private static bool Armsspec
-        {
-            get
-            {
-                var Armsspec = ConfigFile.ReadValue("ProtectionLesion", "Armsspec").Trim();
-
-                return Armsspec != "" && Convert.ToBoolean(Armsspec);
-            }
-            set { ConfigFile.WriteValue("ProtectionLesion", "Armsspec", value.ToString()); }
-        }
-        private static bool generalInterrupts
+		private static bool generalInterrupts
         {
             get
             {
@@ -214,10 +181,9 @@ namespace CloudMagic.Rotation
             }
 
 
-            Log.Write("Welcome to Protection Warrior", Color.Red);
-            Log.Write("Suggested build: 1213112", Color.Red);
+            Log.Write("Welcome to Lesions Total Warrior", Color.Red);
             Log.Write("Version 4.1", Color.Red);
-            Log.Write("Last Edited by Lesion 08/02 - Added more abilities to edit.", Color.Blue);
+            Log.Write("Last Edited by Lesion 21/05", Color.Blue);
 
             SettingsForm = new Form {Text = "Settings", StartPosition = FormStartPosition.CenterScreen, Width = 670, Height = 590, ShowIcon = false};
 
@@ -348,20 +314,8 @@ namespace CloudMagic.Rotation
 
             var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 15, Top = 150, Size = new Size(120, 48)};
 			
-			var cmdprot = new Button {Text = "Protection", Width = 65, Height = 25, Left = 140, Top = 150, Size = new Size(120, 48)};
-			SettingsForm.Controls.Add(cmdprot);
-			var cmdfury = new Button {Text = "Fury", Width = 65, Height = 25, Left = 265, Top = 150, Size = new Size(120, 48)};
-			SettingsForm.Controls.Add(cmdfury);
-			var cmdarms = new Button {Text = "Arms", Width = 65, Height = 25, Left = 390, Top = 150, Size = new Size(120, 48)};
-			SettingsForm.Controls.Add(cmdarms);
-			
-			Protintbox = new CheckBox {Checked = Protspec, TabIndex = 6, Size = new Size(15, 14), Left = 200, Top = 200};
-            SettingsForm.Controls.Add(Protintbox);
-			Furyintbox = new CheckBox {Checked = Furyspec, TabIndex = 6, Size = new Size(15, 14), Left = 300, Top = 200};
-            SettingsForm.Controls.Add(Furyintbox);
-			Armsintbox = new CheckBox {Checked = Armsspec, TabIndex = 6, Size = new Size(15, 14), Left = 400, Top = 200};
-            SettingsForm.Controls.Add(Armsintbox);
-			
+					
+						
             generalint.Checked = generalInterrupts;
             mplusint.Checked = mythicplusinterrupts;
             CDint.Checked = defcooldowns;
@@ -369,16 +323,10 @@ namespace CloudMagic.Rotation
             BCint.Checked = BattleC;
             HPint.Checked = Pots;
             RTDint.Checked = RetToDef;
-			Protintbox.Checked = Protspec;
-			Furyintbox.Checked = Furyspec;
-			Armsintbox.Checked = Armsspec;
-
+			
 
             cmdSave.Click += CmdSave_Click;
-			cmdarms.Click += AS_Click;
-			cmdfury.Click += FY_Click;
-			cmdprot.Click += PT_Click;
-            generalint.CheckedChanged += GI_Click;
+			generalint.CheckedChanged += GI_Click;
             mplusint.CheckedChanged += MP_Click;
             CDint.CheckedChanged += CD_Click;
             SRint.CheckedChanged += SR_Click;
@@ -402,9 +350,7 @@ namespace CloudMagic.Rotation
             SWHPPercentValue.BringToFront();
             HSHPPercentValue.BringToFront();
             IVHPPercentValue.BringToFront();
-			Protintbox.BringToFront();
-			Armsintbox.BringToFront();
-			Furyintbox.BringToFront();
+			
 
 			Log.Write("Player Talents = " + WoW.Talent(1) + WoW.Talent(2) + WoW.Talent(3) + WoW.Talent(4) + WoW.Talent(5) + WoW.Talent(6) + WoW.Talent(7), Color.Green);
 			
@@ -420,10 +366,8 @@ namespace CloudMagic.Rotation
             Log.Write("Shield Wall being used 			@ " + SWHPPercentValue.Value + "%", Color.Red);
             Log.Write("Health Pots being used 			@ " + HSHPPercentValue.Value + "%", Color.Red);
             Log.Write("---------------------------------------------------------", Color.Blue);
-			Log.Write("Spec1" +(WoW.PlayerSpec == "Fury"), Color.Red);
-			Log.Write("Spec2" +(WoW.PlayerSpec == "FURY"), Color.Red);
-			Log.Write("Spec3" +(WoW.PlayerSpec == "Prot"), Color.Red);
-			Log.Write("Spec4" +(WoW.PlayerSpec == "PROT"), Color.Red);
+			Log.Write("Current Ingame Spec" + WoW.PlayerSpec, Color.Red);
+			
 			var picBox = new PictureBox {Left = 0, Top = 0, Width = 650, Height = 550, Image = LowGow};
             SettingsForm.Controls.Add(picBox);
         }
@@ -437,10 +381,7 @@ namespace CloudMagic.Rotation
             BattleC = BCint.Checked;
             Pots = HPint.Checked;
             RetToDef = RTDint.Checked;
-			Protspec = Protintbox.Checked;
-			Furyspec = Furyintbox.Checked;
-			Armsspec = Armsintbox.Checked;
-
+			
 
             ConfigFile.WriteValue("ProtectionLesion", "SB HP Percent", SBHPPercentValue.Value.ToString());
             ConfigFile.WriteValue("ProtectionLesion", "LS HP Percent", LSHPPercentValue.Value.ToString());
@@ -452,30 +393,7 @@ namespace CloudMagic.Rotation
             SettingsForm.Close();
         }
 
-		private void PT_Click(object sender, EventArgs e)
-		{
-			Protspec = Protintbox.Checked;
-			Protintbox.Checked = true;
-			Armsintbox.Checked = false;
-			Furyintbox.Checked = false;
-		}
-		
-		private void FY_Click(object sender, EventArgs e)
-		{
-			Furyintbox.Checked = true;
-			Protintbox.Checked = false;
-			Armsintbox.Checked = false;
-			Furyspec = Furyintbox.Checked;
-		}
-		
-		private void AS_Click(object sender, EventArgs e)
-		{
-			Armsintbox.Checked = true;
-			Protintbox.Checked = false;
-			Armsspec = Armsintbox.Checked;
-			Furyintbox.Checked = false;	
-		}
-	
+			
         private void GI_Click(object sender, EventArgs e)
         {
             generalInterrupts = generalint.Checked;
@@ -546,7 +464,7 @@ namespace CloudMagic.Rotation
 		// ----------------- if class = protection
 		if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave || combatRoutine.Type == RotationType.AOE)  
             {
-			if (Protspec)
+			if (WoW.PlayerSpec == "Protection")
 			{
             if (defcooldowns && WoW.IsInCombat)
             {
@@ -817,7 +735,7 @@ namespace CloudMagic.Rotation
             }
 			}
 			//----------------------------- if class = fury
-			if (Furyspec)
+			if (WoW.PlayerSpec == "Fury")
 			{
 				if (WoW.HasTarget && WoW.IsInCombat && WoW.TargetIsEnemy && WoW.IsSpellInRange("Bloodthirst"))
                 {
@@ -1041,7 +959,7 @@ namespace CloudMagic.Rotation
 			
 			
 			//----------------------------- if class = arms
-			if (Armsspec)
+			if (WoW.PlayerSpec == "Arms")
 			{
 			if (combatRoutine.Type == RotationType.AOE)  
                 {

@@ -351,7 +351,7 @@ namespace CloudMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Scotishdwarf
 AddonName=CloudMagic
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 72000
 [SpellBook.db]
 Spell,20271,Judgement,D1
 Spell,204019,Blessed Hammer,D4

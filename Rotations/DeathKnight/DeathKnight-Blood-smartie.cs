@@ -1,8 +1,9 @@
 //Changelog
-// V2.0 fmflex Blood rotation
-// V2.1 updated for latest PM
-// V2.2 Auto Talent detection added
-// V2.3 added Levelcheck, so ppl can use rota for leveling
+// v2.0 fmflex Blood rotation
+// v2.1 updated for latest PM
+// v2.2 Auto Talent detection added
+// v2.3 added Levelcheck, so ppl can use rota for leveling
+// v2.4 removed Levelcheck, cause its buggy
 
 using System;
 using System.Drawing;
@@ -58,7 +59,7 @@ namespace CloudMagic.Rotation.DeathKnight.DK
 
         public override void Initialize()
         {
-            Log.Write("Welcome to Blood DK V2.3", Color.Green);
+            Log.Write("Welcome to Blood DK v2.4", Color.Green);
             Log.Write("Blooddrinker and Bonestorm Talents supported and auto detected", Color.Green);
             Log.Write("Suggested build 3-2-1-2-1-3-1", Color.Red);			
             SettingsForm = new Form
@@ -127,53 +128,58 @@ namespace CloudMagic.Rotation.DeathKnight.DK
                         useCDDef();
                     if ((renewBones || bonesStack < 3) && isMelee)
                     {
-                        if (currentRunes >= 2 && WoW.Level >= 55)
+                        if (currentRunes >= 2)
                         {
                             WoW.CastSpell("Marrowrend");
                             return;
                         }
                     }
-                    if (WoW.CanCast("Blood Boil", false, true, false, true, false) && isMelee && !WoW.TargetHasDebuff("Blood Plague") && WoW.Level >= 56)
+					if (WoW.CanCast("Mind Freeze") && WoW.TargetIsCastingAndSpellIsInterruptible && WoW.TargetPercentCast >= 60 && !WoW.IsSpellOnCooldown("Mind Freeze") && !WoW.PlayerIsChanneling)
+					{
+						WoW.CastSpell("Mind Freeze");						
+						return;
+					}
+                    if (WoW.CanCast("Blood Boil", false, true, false, true, false) && isMelee && !WoW.TargetHasDebuff("Blood Plague"))
                     {
                         WoW.CastSpell("Blood Boil");
                         return;
                     }
-                    if (CanCastNoRange("Consumption") && isMelee && WoW.Level >= 56)
+                    if (CanCastNoRange("Consumption") && isMelee)
                     {
                         WoW.CastSpell("Consumption");
                         return;
                     }
-                    if (WoW.Talent(1) == 3 && CanCastInRange("BD") && !renewBones && currentRunes >= 1 && WoW.Level >= 56)
+                    if (WoW.Talent(1) == 3 && CanCastInRange("BD") && !renewBones && currentRunes >= 1)
                     {
                         WoW.CastSpell("BD");
                         return;
                     }
-                    if (isMelee && WoW.PlayerHasBuff("Crimson Scourge") && WoW.TargetHealthPercent >= 10 && WoW.Level >= 56)
+                    if (isMelee && WoW.PlayerHasBuff("Crimson Scourge") && WoW.TargetHealthPercent >= 10)
                     {
                         WoW.CastSpell("DnD");
                         return;
                     }
-                    if (isMelee && runicPower >= 45 && WoW.Level >= 55 && ((WoW.PlayerHasBuff("Ossuary") && (runicPower >= 85 || WoW.HealthPercent < 80)) || WoW.HealthPercent < 50))
+                    if (isMelee && runicPower >= 45 && ((WoW.PlayerHasBuff("Ossuary") && (runicPower >= 85 || WoW.HealthPercent < 80)) || WoW.HealthPercent < 50))
                     {
                         WoW.CastSpell("Death Strike");
                         return;
                     }
-                    if (isMelee && currentRunes >= 2 && bonesStack <= 6 && WoW.Level >= 55)
+                    if (isMelee && currentRunes >= 2 && bonesStack <= 6)
                     {
                         WoW.CastSpell("Marrowrend");
                         return;
                     }
-                    if (WoW.SpellCooldownTimeRemaining("DnD") == 0 && isMelee && currentRunes >= 2 && WoW.TargetHealthPercent >= 10 && !renewBones && bonesStack > 6 && WoW.Level >= 56)
+                    if (WoW.SpellCooldownTimeRemaining("DnD") == 0 && isMelee && currentRunes >= 2 && WoW.TargetHealthPercent >= 10 && !renewBones && bonesStack > 6)
                     {
                         WoW.CastSpell("DnD");
                         return;
                     }
-                    if (isMelee && currentRunes >= 2 && !renewBones && bonesStack > 6 && WoW.Level >= 55)
+                    if (isMelee && currentRunes >= 2 && !renewBones && bonesStack > 6 && WoW.TargetHasDebuff("Blood Plague"))
                     {
                         WoW.CastSpell("Heart Strike");
                         return;
                     }
-                    if (WoW.CanCast("Blood Boil", false, true, false, true, false) && isMelee && WoW.Level >= 56)
+                    if (WoW.CanCast("Blood Boil", false, true, false, true, false) && isMelee)
                     {
                         WoW.CastSpell("Blood Boil");
                         return;
@@ -188,65 +194,64 @@ namespace CloudMagic.Rotation.DeathKnight.DK
                         useCDDef();
                     if ((renewBones || bonesStack < 3) && isMelee)
                     {
-                        if (currentRunes >= 2 && WoW.Level >= 55)
+                        if (currentRunes >= 2)
                         {
                             WoW.CastSpell("Marrowrend");
                             return;
                         }
                     }
-                    if (WoW.CanCast("Blood Boil", true, true, false, true, true) && isMelee && !WoW.TargetHasDebuff("Blood Plague") && WoW.Level >= 56)
+                    if (WoW.CanCast("Blood Boil", true, true, false, true, true) && isMelee && !WoW.TargetHasDebuff("Blood Plague"))
                     {
                         WoW.CastSpell("Blood Boil");
                         return;
                     }
-                    if (WoW.Talent(1) == 3 && CanCastInRange("BD") && WoW.HealthPercent <= 60 && !renewBones && currentRunes >= 1 && WoW.Level >= 56)
+                    if (WoW.Talent(1) == 3 && CanCastInRange("BD") && WoW.HealthPercent <= 60 && !renewBones && currentRunes >= 1)
                     {
                         WoW.CastSpell("BD");
                         return;
                     }
-                    if (CanCastNoRange("Consumption") && isMelee && WoW.Level >= 56)
+                    if (CanCastNoRange("Consumption") && isMelee)
                     {
                         WoW.CastSpell("Consumption");
                         return;
                     }
-                    if (isMelee && WoW.PlayerHasBuff("Crimson Scourge") && WoW.TargetHealthPercent >= 10 && WoW.Level >= 56)
+                    if (isMelee && WoW.PlayerHasBuff("Crimson Scourge") && WoW.TargetHealthPercent >= 10)
                     {
                         WoW.CastSpell("DnD");
                         return;
                     }
-                    if (WoW.Talent(7) == 1 && WoW.SpellCooldownTimeRemaining("Bonestorm") == 0 && isMelee && runicPower >= 100 && WoW.Level >= 100)
+                    if (WoW.Talent(7) == 1 && WoW.SpellCooldownTimeRemaining("Bonestorm") == 0 && isMelee && runicPower >= 100)
                     {
                         WoW.CastSpell("Bonestorm");
                         return;
                     }
-                    if (WoW.Talent(7) == 1 && isMelee && WoW.Level >= 55 && runicPower >= 45 &&
-                        ((runicPower >= 85 && WoW.SpellCooldownTimeRemaining("Bonestorm") >= 300) || WoW.HealthPercent < 70 || WoW.HealthPercent < 50))
+                    if (WoW.Talent(7) == 1 && isMelee && runicPower >= 45 && ((runicPower >= 85 && WoW.SpellCooldownTimeRemaining("Bonestorm") >= 300) || WoW.HealthPercent < 70 || WoW.HealthPercent < 50))
                     {
                         WoW.CastSpell("Death Strike");
                         return;
                     }
-                    if (WoW.Talent(7) != 1 && isMelee && runicPower >= 45 && (runicPower >= 85 || WoW.HealthPercent < 70) && WoW.Level >= 55)
+                    if (WoW.Talent(7) != 1 && isMelee && runicPower >= 45 && (runicPower >= 85 || WoW.HealthPercent < 70))
                     {
                         WoW.CastSpell("Death Strike");
                         return;
                     }
 
-                    if (WoW.SpellCooldownTimeRemaining("DnD") == 0 && isMelee && currentRunes >= 1 && WoW.TargetHealthPercent >= 10 && !renewBones && bonesStack > 2 && WoW.Level >= 56)
+                    if (WoW.SpellCooldownTimeRemaining("DnD") == 0 && isMelee && currentRunes >= 1 && WoW.TargetHealthPercent >= 10 && !renewBones && bonesStack > 2)
                     {
                         WoW.CastSpell("DnD");
                         return;
                     }
-                    if (isMelee && currentRunes >= 1 && !renewBones && bonesStack > 2 && WoW.Level >= 55)
+                    if (isMelee && currentRunes >= 1 && !renewBones && bonesStack > 2)
                     {
                         WoW.CastSpell("Heart Strike");
                         return;
                     }
-                    if (WoW.CanCast("Blood Boil", false, true, false, true, false) && isMelee && WoW.Level >= 56)
+                    if (WoW.CanCast("Blood Boil", false, true, false, true, false) && isMelee)
                     {
                         WoW.CastSpell("Blood Boil");
                         return;
                     }
-                    if (WoW.Talent(1) == 3 && CanCastInRange("BD") && !renewBones && currentRunes >= 1 && WoW.Level >= 56)
+                    if (WoW.Talent(1) == 3 && CanCastInRange("BD") && !renewBones && currentRunes >= 1)
                     {
                         WoW.CastSpell("BD");
                     }
@@ -256,17 +261,17 @@ namespace CloudMagic.Rotation.DeathKnight.DK
 
         public void useCDDef()
         {
-            if (CanCastNoRange("Anti-Magic Shell") && WoW.HealthPercent < 70 && !WoW.IsSpellOnCooldown("Anti-Magic Shell") && WoW.Level >= 57)
+            if (CanCastNoRange("Anti-Magic Shell") && WoW.HealthPercent < 70 && !WoW.IsSpellOnCooldown("Anti-Magic Shell"))
             {
                 WoW.CastSpell("Anti-Magic Shell");
                 return;
             }
-            if (CanCastNoRange("Icebound Fortitude") && WoW.HealthPercent < 40 && !WoW.IsSpellOnCooldown("Icebound Fortitude") && WoW.Level >= 65)
+            if (CanCastNoRange("Icebound Fortitude") && WoW.HealthPercent < 40 && !WoW.IsSpellOnCooldown("Icebound Fortitude"))
             {
                 WoW.CastSpell("Icebound Fortitude");
                 return;
             }
-            if (CanCastNoRange("Vampiric Blood") && WoW.HealthPercent < 50 && !WoW.IsSpellOnCooldown("Vampiric Blood") && WoW.Level >= 57)
+            if (CanCastNoRange("Vampiric Blood") && WoW.HealthPercent < 50 && !WoW.IsSpellOnCooldown("Vampiric Blood"))
             {
                 WoW.CastSpell("Vampiric Blood");
             }

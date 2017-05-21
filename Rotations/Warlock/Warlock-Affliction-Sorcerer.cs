@@ -1,7 +1,3 @@
-﻿// winifix@gmail.com
-// ReSharper disable UnusedMember.Global
-// ReSharper disable ConvertPropertyToExpressionBody
-
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -484,8 +480,8 @@ namespace CloudMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Sorcerer
-AddonName=CloudMagic
-WoWVersion=Legion - 70100
+AddonName=Quartz
+WoWVersion=Legion - 72000
 [SpellBook.db]
 Spell,980,Agony,NumPad1
 Spell,63106,Siphon Life,NumPad2

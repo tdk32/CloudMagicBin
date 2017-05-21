@@ -43,16 +43,34 @@ namespace CloudMagic.Rotation
         }
 
        private readonly Stopwatch stopwatch = new Stopwatch();
+		private  bool lastNamePlate = false;
+        public  void SelectRotation(int aoe, int cleave, int single)
+        {
+            int count = WoW.CountEnemyNPCsInRange;
+            if(lastNamePlate)
+            {
+                combatRoutine.ChangeType(RotationType.SingleTarget);
+                lastNamePlate =false;
+            }
+            lastNamePlate = WoW.Nameplates;
+            if (count >= 3)
+                combatRoutine.ChangeType(RotationType.AOE);
+            if (count == 2)
+                combatRoutine.ChangeType(RotationType.SingleTargetCleave);
+            if (count <= 1)
+                combatRoutine.ChangeType(RotationType.SingleTarget);
+
+        }
        public override void Pulse()
         {
 			if (stopwatch.ElapsedMilliseconds == 0)
                     {
 						stopwatch.Start ();
-						Log.WriteCloudMagic("The Cooldown toggle button is now Active (Numpad0). The delay is set to 500ms ( 0.5 second )", Color.Black);	
+						Log.WriteCloudMagic("The Cooldown toggle button is now Active (Numpad9). The delay is set to 500ms ( 0.5 second )", Color.Black);	
 						return;
 					}		
             {
-			if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_NUMPAD0) < 0)
+			if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_NUMPAD9) < 0)
             {
                 if(stopwatch.ElapsedMilliseconds > 500)
                 { 
@@ -184,6 +202,11 @@ namespace CloudMagic.Rotation
 						WoW.CastSpell("Rupture");
 						return;
 					}
+					if (UseCooldowns && WoW.CanCast("Berserk") && !WoW.IsSpellOnCooldown("Berserk") && WoW.TargetHasDebuff ("Vendetta") && WoW.PlayerRace == "Troll")
+                    {
+                        WoW.CastSpell("Berserk");
+                        return;
+                    }
 					
 				}
                 
@@ -229,6 +252,11 @@ namespace CloudMagic.Rotation
 						WoW.CastSpell("Garrote");
 						return;
 					}
+					if (UseCooldowns && WoW.CanCast("Berserk") && !WoW.IsSpellOnCooldown("Berserk") )
+                    {
+                           WoW.CastSpell("Berserk");
+                           return;
+                    }
 				}
             }
         }
@@ -238,7 +266,7 @@ namespace CloudMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Creepyjoker
-AddonName=Sucstobeyou
+AddonName=smartie
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,1943,Rupture,D2
@@ -249,6 +277,7 @@ Spell,703,Garrote,R
 Spell,192759,Kingsbane,D3
 Spell,32645,Envenom,Q
 Spell,51723,Fan Of Knives,X
+Spell,26297,Berserk,D0
 Aura,1943,Rupture
 Aura,1784,Stealth
 Aura,703,Garrote

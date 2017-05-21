@@ -1,7 +1,3 @@
-﻿// winifix@gmail.com
-// ReSharper disable UnusedMember.Global
-// ReSharper disable ConvertPropertyToExpressionBody
-
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -53,7 +49,7 @@ namespace CloudMagic.Rotation
                     && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1)
                     && (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion"))
                     && !WoW.PlayerHasBuff("Feign Death")
-                    && WoW.HealthPercent <= 20
+                    && WoW.HealthPercent <= 30
                     && !WoW.IsMounted
                     && WoW.HealthPercent != 0)
                 {
@@ -65,7 +61,7 @@ namespace CloudMagic.Rotation
 
                 //Exhilaration
                 if (WoW.CanCast("Exhilaration")
-                    && WoW.HealthPercent <= 30
+                    && WoW.HealthPercent <= 20
                     && !WoW.IsMounted
                     && !WoW.PlayerHasBuff("Feign Death")
                     && WoW.HealthPercent != 0)
@@ -724,7 +720,7 @@ namespace CloudMagic.Rotation
 [AddonDetails.db]
 AddonAuthor=Sorcerer
 AddonName=Quartz
-WoWVersion=Legion - 70100
+WoWVersion=Legion - 72000
 [SpellBook.db]
 Spell,136,Mend Pet,D0
 Spell,982,Revive Pet,D0
@@ -745,7 +741,6 @@ Spell,2643,Multi-Shot,NumPad5
 Spell,207068,Titan's Thunder,Add
 Spell,19574,Bestial Wrath,NumPad9
 Spell,55709,Heart of the Phoenix,D0
-Spell,144259,Kil'jaeden's Burning Wish,
 Spell,193530,Aspect of the Wild,Divide
 Spell,53209,Chimaera Shot,D0
 Spell,201430,Stampede,NumPad6
@@ -762,5 +757,4 @@ Aura,194386,Voley
 Aura,217200,Dire Frenzy
 Item,5512,Healthstone
 Item,127834,Potion
-Item,144259,Kil'jaeden's Burning Wish
 */

@@ -14,23 +14,21 @@ namespace CloudMagic.Rotation
 {
     public class SVHunterVectarius : CombatRoutine
     {
+		private NumericUpDown nudExhilarationPercentValue;
+		private NumericUpDown nudAspectoftheTurtlePercentValue;
+		private NumericUpDown nudFeignDeathPercentValue;		
+		
 		private readonly Stopwatch tacticswatch = new Stopwatch();
 		private readonly Stopwatch pullwatch = new Stopwatch();
-		 private int GCD
+		private float GCD
         {
             get
             {
-                if (150 / (1 + (WoW.HastePercent / 100)) > 75)
-                {
-                    return 150 / (1 + (WoW.HastePercent / 100));
-                }
-                else
-                {
-                    return 75;
-                }
+
+                    return (150f / (1f + (WoW.HastePercent / 100f)));
+
             }
         }
-		
 private float FocusRegen
 {
      get
@@ -38,19 +36,57 @@ private float FocusRegen
          return (10f* (1f + (WoW.HastePercent / 100f)));
      }
 }	
+private float FocusTimetoMax
+{
+     get
+     {
+         return ((120f - WoW.Focus) /(10f* (1f + (WoW.HastePercent / 100f)))) *100f;
+     }
+}
+
+			//Pet Control	
+		private CheckBox HealPetBox;
+		// Items
+		private CheckBox KilJaedenBox;			
+
+
 		// DEF cds
 		private CheckBox ExhilarationBox;
 		private CheckBox FeignDeathBox;
-		private CheckBox AspectoftheTurtleBox;
-		
+		private CheckBox AspectoftheTurtleBox;	
+
 		private CheckBox MuzzleBox;		
-		
 		
 		//dps cds
 		private CheckBox AspectoftheEagleBox;
 		
 		
 
+		private static bool KilJaeden
+        {
+            get
+            {
+                var KilJaeden = ConfigFile.ReadValue("HunterBeastmastery", "KilJaeden").Trim();
+
+                return KilJaeden != "" && Convert.ToBoolean(KilJaeden);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "KilJaeden", value.ToString()); }
+        }	
+		
+        private static bool HealPet
+        {
+            get
+            {
+                var HealPet = ConfigFile.ReadValue("HunterBeastmastery", "HealPet").Trim();
+
+                return HealPet != "" && Convert.ToBoolean(HealPet);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "HealPet", value.ToString()); }
+        }
+		
+		
+
+		
         private static bool Muzzle
         {
             get
@@ -60,7 +96,7 @@ private float FocusRegen
                 return Muzzle != "" && Convert.ToBoolean(Muzzle);
             }
             set { ConfigFile.WriteValue("HunterBeastmastery", "Muzzle", value.ToString()); }
-        }			
+        }	
 		
         private static bool Exhilaration
         {
@@ -93,7 +129,7 @@ private float FocusRegen
                 return AspectoftheTurtle != "" && Convert.ToBoolean(AspectoftheTurtle);
             }
             set { ConfigFile.WriteValue("HunterBeastmastery", "AspectoftheTurtle", value.ToString()); }
-        }			
+        }				
 		
         private static bool AspectoftheEagle
         {
@@ -106,11 +142,13 @@ private float FocusRegen
             set { ConfigFile.WriteValue("HunterBeastmastery", "AspectoftheEagle", value.ToString()); }
         }		
 		
+
 		
+
         
       public override string Name
         {
-            get { return "Hunter Survival"; }
+            get { return "Hunter SV"; }
         }
 
         
@@ -124,23 +162,60 @@ private float FocusRegen
 		
         public override void Initialize()
         {
-			
-            
-            SettingsForm = new Form
-            {
-                Text = "Survival Hunter",
-                StartPosition = FormStartPosition.CenterScreen,
-                Width = 1000,
-                Height = 600,
-                ShowIcon = false
-            };
-
            
+			if (ConfigFile.ReadValue("Hunter", "AspectoftheTurtle Percent") == "")
+            {
+                ConfigFile.WriteValue("Hunter", "AspectoftheTurtle Percent", "15");
+            }
+						if (ConfigFile.ReadValue("Hunter", "FeignDeath Percent") == "")
+            {
+                ConfigFile.WriteValue("Hunter", "FeignDeath Percent", "5");
+            }
+						if (ConfigFile.ReadValue("Hunter", "Exhilaration Percent") == "")
+            {
+                ConfigFile.WriteValue("Hunter", "Exhilaration Percent", "45");
+            }
+		   
+SettingsForm = new Form {Text = "SV Hunter", StartPosition = FormStartPosition.CenterScreen, Width = 400, Height = 500, ShowIcon = false};
+
+            nudAspectoftheTurtlePercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "AspectoftheTurtle Percent"), 
+			Left = 215, 
+			Top = 172,
+			Size = new Size (40, 10)
+			}; 
+			SettingsForm.Controls.Add(nudAspectoftheTurtlePercentValue);
+			
+		
+
+            nudExhilarationPercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "Exhilaration Percent"), 
+			Left = 215, 
+			Top = 122,
+			Size = new Size (40, 10)
+			};
+			SettingsForm.Controls.Add(nudExhilarationPercentValue);
+			
+			
+		
+
+            nudFeignDeathPercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "FeignDeath Percent"), 
+			Left = 215, 
+			Top =147,
+			Size = new Size (40, 10)
+			};
+			SettingsForm.Controls.Add(nudFeignDeathPercentValue);
+			
+			
+
+
+			
 			var lblTitle = new Label
             {
                 Text =
                     "SV Hunter by Vectarius",
-                Size = new Size(270, 13),
+                Size = new Size(270, 14),
                 Left = 61,
                 Top = 1
 	       };
@@ -149,42 +224,42 @@ private float FocusRegen
 			lblTitle.Font = myFont;
             SettingsForm.Controls.Add(lblTitle);
 			
-		
-			
-			
-			
 			
 
-						var lblTextBox3 = new Label
+			
+
+			
+			var lblTextBox3 = new Label
             {
                 Text =
                     "Cooldowns",
                 Size = new Size(200, 17),
                 Left = 70,
-                Top = 250
+                Top = 50
             };
 			lblTextBox3.ForeColor = Color.Black;
 			 SettingsForm.Controls.Add(lblTextBox3);
-			
+
+			 
 			var lblAspectoftheEagleBox = new Label
             {
                 Text =
-                    "Aspect of the Eagle",
+                    "AspectoftheEagle",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 275
+                Top = 75
             };
 			
 			lblAspectoftheEagleBox.ForeColor = Color.Black;
-            SettingsForm.Controls.Add(lblAspectoftheEagleBox);	
-
+            SettingsForm.Controls.Add(lblAspectoftheEagleBox);			
+           
 			var lblMuzzleBox = new Label
             {
                 Text =
                     "Muzzle",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 300
+                Top = 100
             };
 			
 			lblMuzzleBox.ForeColor = Color.Black;
@@ -193,10 +268,10 @@ private float FocusRegen
 			var lblExhilarationBox = new Label
             {
                 Text =
-                    "Exhilaration",
+                    "Exhilaration @",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 325
+                Top = 125
             };
 			
 			lblExhilarationBox.ForeColor = Color.Black;
@@ -205,10 +280,10 @@ private float FocusRegen
 			var lblAspectoftheTurtleBox = new Label
             {
                 Text =
-                    "Aspect of the Turtle",
+                    "Aspect of the Turtle @",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 350
+                Top = 175
             };
 			
 			lblAspectoftheTurtleBox.ForeColor = Color.Black;
@@ -217,111 +292,200 @@ private float FocusRegen
 			var lblFeignDeathBox = new Label
             {
                 Text =
-                    "Feign Death",
+                    "Feign Death @",
                 Size = new Size(270, 15),
                 Left = 100,
-                Top = 375
+                Top = 150
             };
 			
 			lblFeignDeathBox.ForeColor = Color.Black;
             SettingsForm.Controls.Add(lblFeignDeathBox);		
 
-			
 
-			
-           
-			var lblDiscordBox = new Label
+
+					
+			 
+			var lblTextBox5 = new Label
             {
                 Text =
-                    "Please report any issues on #Hunter",
-                Size = new Size(270, 250),
-                Left = 560,
-                Top = 545
+                    "Pet Control",
+                Size = new Size(200, 17),
+                Left = 70,
+                Top = 225
             };
-			lblDiscordBox.ForeColor = Color.Black;
-            SettingsForm.Controls.Add(lblDiscordBox);
+			lblTextBox5.ForeColor = Color.Black;
+			 SettingsForm.Controls.Add(lblTextBox5);			 
+
+						var lblTextBox6 = new Label
+            {
+                Text =
+                    "Items",
+                Size = new Size(200, 17),
+                Left = 70,
+                Top = 275
+            };
+			lblTextBox6.ForeColor = Color.Black;
+			 SettingsForm.Controls.Add(lblTextBox6);
+			 
+
+
+
+	
+
+			var lblHealPetBox = new Label
+            {
+                Text =
+                    "Heal Pet",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 250
+            };
 			
-			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 425, Size = new Size(120, 31)};
+			lblHealPetBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblHealPetBox);	
+
+			var lblKilJaedenBox = new Label
+            {
+                Text =
+                    "Kil'Jaeden's Burning Wish",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 300
+            };
 			
-			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 425, Size = new Size(120, 31)};
+			lblKilJaedenBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblKilJaedenBox);			
+		   
+
+			
+			
+			
+			
+			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 375, Size = new Size(120, 31)};
+			
+			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 375, Size = new Size(120, 31)};
+			
+ 
+
+//items
+            KilJaedenBox = new CheckBox {Checked = KilJaeden, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 300};		
+            SettingsForm.Controls.Add(KilJaedenBox);
+//pet control			
+			HealPetBox = new CheckBox {Checked = HealPet, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 250};			
+            SettingsForm.Controls.Add(HealPetBox);
+			
 			// Checkboxes
-            
-			MuzzleBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 300};		
+            MuzzleBox = new CheckBox {Checked = Muzzle, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 100};		
             SettingsForm.Controls.Add(MuzzleBox);
-			ExhilarationBox = new CheckBox {Checked = Exhilaration, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 325};			
+			ExhilarationBox = new CheckBox {Checked = Exhilaration, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 125};			
             SettingsForm.Controls.Add(ExhilarationBox);
-			FeignDeathBox = new CheckBox {Checked = FeignDeath, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 350};
+			FeignDeathBox = new CheckBox {Checked = FeignDeath, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 150};
             SettingsForm.Controls.Add(FeignDeathBox);
 			
-			AspectoftheTurtleBox = new CheckBox {Checked = AspectoftheTurtle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 375};			
-			            SettingsForm.Controls.Add(AspectoftheTurtleBox);
+			AspectoftheTurtleBox = new CheckBox {Checked = AspectoftheTurtle, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 175};			
+			            SettingsForm.Controls.Add(AspectoftheTurtleBox);		
 			//dps cooldowns
-            AspectoftheEagleBox = new CheckBox {Checked = AspectoftheEagle, TabIndex = 8, Size = new Size(13, 13), Left = 70, Top = 275};
+            AspectoftheEagleBox = new CheckBox {Checked = AspectoftheEagle, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 75};
             SettingsForm.Controls.Add(AspectoftheEagleBox);			
+
 			
 			
-			//dps cooldowns
 			MuzzleBox.Checked = Muzzle;	
 			ExhilarationBox.Checked = Exhilaration;	
 			FeignDeathBox.Checked = FeignDeath;	
-			AspectoftheTurtleBox.Checked = AspectoftheTurtle;				
+			AspectoftheTurtleBox.Checked = AspectoftheTurtle;	
 			
 			AspectoftheEagleBox.Checked = AspectoftheEagle;
-			// Box Check
-            
+
+			
+
+		
 			
 			//cmdSave
-            AspectoftheEagleBox.CheckedChanged += AspectoftheEagle_Click;      
+
+			
+            KilJaedenBox.CheckedChanged += KilJaeden_Click;    
+            HealPetBox.CheckedChanged += HealPet_Click;				
+			
+            AspectoftheEagleBox.CheckedChanged += AspectoftheEagle_Click;    
             ExhilarationBox.CheckedChanged += Exhilaration_Click; 
             MuzzleBox.CheckedChanged += Muzzle_Click;
             FeignDeathBox.CheckedChanged += FeignDeath_Click;
-            AspectoftheTurtleBox.CheckedChanged += AspectoftheTurtle_Click;				
+            AspectoftheTurtleBox.CheckedChanged += AspectoftheTurtle_Click;	
+			
 			
 			cmdSave.Click += CmdSave_Click;
 			cmdReadme.Click += CmdReadme_Click;
-            
+ 
 			
 			SettingsForm.Controls.Add(cmdSave);
 			SettingsForm.Controls.Add(cmdReadme);
-			lblDiscordBox.BringToFront();
-
-			lblTextBox3.BringToFront();			
+		
+			lblTextBox5.BringToFront();		
+			lblTextBox6.BringToFront();				
 			lblTitle.BringToFront();
+
+			nudExhilarationPercentValue.BringToFront();
+			nudAspectoftheTurtlePercentValue.BringToFront();
+			nudFeignDeathPercentValue.BringToFront();		
 			
-            AspectoftheEagleBox.BringToFront();		
+            KilJaedenBox.BringToFront();	
+            HealPetBox.BringToFront();				
+			
+            AspectoftheEagleBox.BringToFront();	
             MuzzleBox.BringToFront();	
             ExhilarationBox.BringToFront();
             FeignDeathBox.BringToFront();
             AspectoftheTurtleBox.BringToFront();				
 			
-			
+
 			
 			
 		}
 			
 			private void CmdSave_Click(object sender, EventArgs e)
         {
+
+
+            KilJaeden = KilJaedenBox.Checked;		
+            HealPet = HealPetBox.Checked;				
+			
             AspectoftheEagle = AspectoftheEagleBox.Checked;		
             Muzzle = MuzzleBox.Checked;	
             Exhilaration = ExhilarationBox.Checked;
             FeignDeath = FeignDeathBox.Checked;
             AspectoftheTurtle = AspectoftheTurtleBox.Checked;			
 			
-
+            ConfigFile.WriteValue("Hunter", "AspectoftheTurtle Percent", nudAspectoftheTurtlePercentValue.Value.ToString());
+	        ConfigFile.WriteValue("Hunter", "FeignDeath Percent", nudFeignDeathPercentValue.Value.ToString());		
+            ConfigFile.WriteValue("Hunter", "Exhilaration Percent", nudExhilarationPercentValue.Value.ToString());			
 			
 			
-			
-			
-            MessageBox.Show("Settings saved.", "CloudMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Settings saved.", "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
             SettingsForm.Close();
         }
 		private void CmdReadme_Click(object sender, EventArgs e)
         {
             MessageBox.Show(
-                " no macros <.<",
-                "CloudMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                " make sure you make macros of Kill Command and Dire Frenzy/Beast /petattack",
+                "PixelMagic", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-			// Checkboxes
+	
+
+		
+//items
+		private void KilJaeden_Click(object sender, EventArgs e)
+        {
+            KilJaeden = KilJaedenBox.Checked;
+        }			
+			
+//pet control			
+		private void HealPet_Click(object sender, EventArgs e)
+        {
+            HealPet = HealPetBox.Checked;
+        }	
+
+			
 		private void Muzzle_Click(object sender, EventArgs e)
         {
             Muzzle = MuzzleBox.Checked;
@@ -344,7 +508,6 @@ private float FocusRegen
         {
             AspectoftheEagle = AspectoftheEagleBox.Checked;
         }			
-			
 
 		
 		
@@ -354,13 +517,36 @@ private float FocusRegen
 			
         }
 
+        private static bool lastNamePlate = true;
+        public void SelectRotation(int aoe, int cleave, int single)
+        {
+            int count = WoW.CountEnemyNPCsInRange;
+            if (!lastNamePlate)
+            {
+                combatRoutine.ChangeType(RotationType.SingleTarget);
+                lastNamePlate = true;
+            }
+            lastNamePlate = WoW.Nameplates;
+            if (count >= aoe)
+                combatRoutine.ChangeType(RotationType.AOE);
+            if (count == cleave)
+                combatRoutine.ChangeType(RotationType.SingleTargetCleave);
+            if (count <= single)
+                combatRoutine.ChangeType(RotationType.SingleTarget);
+
+        }       
+
         public override void Pulse()
         {
-			if (DetectKeyPress.GetKeyState(0x6A) < 0)
+			if (WoW.IsInCombat && Control.IsKeyLocked(Keys.Scroll) && !WoW.TargetIsPlayer && !WoW.IsMounted)
+			{	
+			SelectRotation(2, 100, 1 );
+			}
+		if (DetectKeyPress.GetKeyState(0x6A) < 0)
             {
                 UseCooldowns = !UseCooldowns;
                 Thread.Sleep(150);
-            }
+            }			
             if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave )  // Do Single Target Stuff here
             {
 		
@@ -405,9 +591,32 @@ private float FocusRegen
                 {	
 
 //3	0.00	summon_pet
-					if (!WoW.HasPet && WoW.CanCast("Wolf") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
+                    if (!WoW.HasPet && WoW.CanCast("Wolf"))
 					{
 						WoW.CastSpell("Wolf") ;
+						return;
+					}
+					if (WoW.PetHealthPercent <= 0 && WoW.CanCast("Phoenix"))
+					{
+						WoW.CastSpell("Phoenix") ;
+						return;
+					}
+				
+					if (WoW.PetHealthPercent <= 90 
+						&& WoW.Level >= 14&& !WoW.PetHasBuff("Heal Pet")
+						&& HealPet						
+						&& WoW.CanCast("Revive Pet") 
+						&& !WoW.IsMoving)
+					{
+						WoW.CastSpell("Heal Pet") ;
+						return;
+					}					
+					if (WoW.PetHealthPercent <= 0 
+						&& WoW.IsSpellOnCooldown("Phoenix") 
+						&& WoW.CanCast("Revive Pet") 
+						&& !WoW.IsMoving)
+					{
+						WoW.CastSpell("Revive Pet") ;
 						return;
 					}
 
@@ -1124,7 +1333,7 @@ if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
 /*
 [AddonDetails.db]
 AddonAuthor=Vectarius
-AddonName=CloudMagic
+AddonName=PixelMagic
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,190928,Mongoose Bite,D1
@@ -1152,6 +1361,9 @@ Spell,201078,Snake Hunter,D0
 Spell,109304,Exhilaration,F5
 Spell,186265,Aspect of the Turtle,F6
 Spell,5384,Feign Death,F7
+Spell,55709,Phoenix,none
+Spell,982,Revive Pet,X
+Spell,136,Heal Pet,X
 Aura,190931,Mongoose Fury
 Aura,87935,Serpent Sting
 Aura,185855,Lacerate

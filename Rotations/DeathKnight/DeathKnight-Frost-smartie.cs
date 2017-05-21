@@ -4,8 +4,12 @@
 // v2.2 added hotkey for Sindragosa's Fury
 // v2.3 added support for Legendary Ring
 // v2.4 Auto Talent detection added
-// V2.5 Bugfixes
-// V2.6 added Levelcheck, so ppl can use rota for leveling
+// v2.5 Bugfixes
+// v2.6 added Levelcheck, so ppl can use rota for leveling
+// v2.7 removed Levelcheck cause it buggy
+// v2.8 cleanup and added Racials
+// v2.9 Racial update
+// v3.0 added Deathstrike
 
 using System;
 using System.ComponentModel;
@@ -20,21 +24,12 @@ namespace CloudMagic.Rotation
 {
     public class DKFrostMGFmflex : CombatRoutine
     {
-
-        private bool AddonEdited = false;
-
         private bool haveCoF = true;
         private bool haveHRW = true;
 
         private static readonly Stopwatch coolDownStopWatch = new Stopwatch();
-        private int currentRunes;
-        private bool hasBreath;
         private bool useNextHRWCharge = false;
 		private bool legyringtest = true;
-
-        private bool isMelee;
-        private int runicPower;
-        private bool useChainofIce = false;
 
         public override string Name
         {
@@ -94,6 +89,131 @@ namespace CloudMagic.Rotation
             }
             set { ConfigFile.WriteValue("DkFrost", "cooldownHotKeyString", value); }
         }
+		
+        public static bool isCheckHotkeyslegyring
+        {
+            get
+            {
+                var isCheckHotkeyslegyring = ConfigFile.ReadValue("DkFrost", "isCheckHotkeyslegyring").Trim();
+
+                if (isCheckHotkeyslegyring != "")
+                {
+                    return Convert.ToBoolean(isCheckHotkeyslegyring);
+                }
+
+                return true;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeyslegyring", value.ToString()); }
+        }
+		
+        public static bool isCheckHotkeysRacials
+        {
+            get
+            {
+                var isCheckHotkeysRacials = ConfigFile.ReadValue("DkFrost", "isCheckHotkeysRacials").Trim();
+
+                if (isCheckHotkeysRacials != "")
+                {
+                    return Convert.ToBoolean(isCheckHotkeysRacials);
+                }
+
+                return true;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeysRacials", value.ToString()); }
+        }
+		
+        public static bool isCheckHotkeysFrostDeathstrike
+        {
+            get
+            {
+                var isCheckHotkeysFrostDeathstrike = ConfigFile.ReadValue("DkFrost", "isCheckHotkeysFrostDeathstrike").Trim();
+
+                if (isCheckHotkeysFrostDeathstrike != "")
+                {
+                    return Convert.ToBoolean(isCheckHotkeysFrostDeathstrike);
+                }
+
+                return true;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeysFrostDeathstrike", value.ToString()); }
+        }
+
+        public static int FrostDeathstrikeHPPercent
+        {
+            get
+            {
+                var FrostDeathstrikeHPPercent = ConfigFile.ReadValue("DKFrost", "FrostDeathstrikeHPPercent").Trim();
+                if (FrostDeathstrikeHPPercent != "")
+                {
+                    return Convert.ToInt32(FrostDeathstrikeHPPercent);
+                }
+
+                return -1;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "FrostDeathstrikeHPPercent", value.ToString()); }
+        }
+		
+        public static bool isCheckHotkeysFrostKick
+        {
+            get
+            {
+                var isCheckHotkeysFrostKick = ConfigFile.ReadValue("DkFrost", "isCheckHotkeysFrostKick").Trim();
+
+                if (isCheckHotkeysFrostKick != "")
+                {
+                    return Convert.ToBoolean(isCheckHotkeysFrostKick);
+                }
+
+                return true;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeysFrostKick", value.ToString()); }
+        }
+
+        public static int FrostKickPercent
+        {
+            get
+            {
+                var FrostKickPercent = ConfigFile.ReadValue("DKFrost", "FrostKickPercent").Trim();
+                if (FrostKickPercent != "")
+                {
+                    return Convert.ToInt32(FrostKickPercent);
+                }
+
+                return -1;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "FrostKickPercent", value.ToString()); }
+        }
+		
+        public static bool isCheckHotkeysFrostFreeDeathstrike
+        {
+            get
+            {
+                var isCheckHotkeysFrostFreeDeathstrike = ConfigFile.ReadValue("DkFrost", "isCheckHotkeysFrostFreeDeathstrike").Trim();
+
+                if (isCheckHotkeysFrostFreeDeathstrike != "")
+                {
+                    return Convert.ToBoolean(isCheckHotkeysFrostFreeDeathstrike);
+                }
+
+                return true;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeysFrostFreeDeathstrike", value.ToString()); }
+        }
+
+        public static int FrostFreeDeathstrikeHPPercent
+        {
+            get
+            {
+                var FrostFreeDeathstrikeHPPercent = ConfigFile.ReadValue("DKFrost", "FrostFreeDeathstrikeHPPercent").Trim();
+                if (FrostFreeDeathstrikeHPPercent != "")
+                {
+                    return Convert.ToInt32(FrostFreeDeathstrikeHPPercent);
+                }
+
+                return -1;
+            }
+            set { ConfigFile.WriteValue("DkFrost", "FrostFreeDeathstrikeHPPercent", value.ToString()); }
+        }
 
         public static bool isCheckHotkeysFrostIceboundFortitude
         {
@@ -109,22 +229,6 @@ namespace CloudMagic.Rotation
                 return true;
             }
             set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeysFrostIceboundFortitude", value.ToString()); }
-        }
-
-        public static bool isCheckHotkeyslegyring
-        {
-            get
-            {
-                var isCheckHotkeyslegyring = ConfigFile.ReadValue("DkFrost", "isCheckHotkeyslegyring").Trim();
-
-                if (isCheckHotkeyslegyring != "")
-                {
-                    return Convert.ToBoolean(isCheckHotkeyslegyring);
-                }
-
-                return true;
-            }
-            set { ConfigFile.WriteValue("DkFrost", "isCheckHotkeyslegyring", value.ToString()); }
         }
 
         public static int FrostIceboundHPPercent
@@ -207,36 +311,40 @@ namespace CloudMagic.Rotation
 
         public override void Initialize()
         {
-            Log.Write("Welcome to the Frost DK v. 2.6", Color.Green);
+            Log.Write("Welcome to the Frost DK v3.0", Color.Green);
 	        Log.Write("All Talents supported and auto detected", Color.Green);		
 			Log.Write("Hold down Z key (Y for US) for Sindragosa's Fury", Color.Red);
             SettingsFormDFF = new SettingsFormDFF();
             SettingsForm = SettingsFormDFF;
 
             SettingsFormDFF.btnHotkeysFrostOffensiveCooldowns.Text = cooldownHotKeyString;
-
             SettingsFormDFF.checkHotkeysFrostOffensiveErW.Checked = isCheckHotkeysFrostOffensiveErW;
             SettingsFormDFF.checkHotkeysFrostOffensivePillarofFrost.Checked = isCheckHotkeysFrostOffensivePillarofFrost;
             SettingsFormDFF.checkHotkeysFrostAntiMagicShield.Checked = isCheckHotkeysFrostAntiMagicShield;
-            SettingsFormDFF.checkHotkeysFrostIceboundFortitude.Checked = isCheckHotkeysFrostIceboundFortitude;
-            SettingsFormDFF.checkHotkeyslegyring.Checked = isCheckHotkeyslegyring;
-            SettingsFormDFF.checkHotkeysFrostIFPercent.Text = FrostIceboundHPPercent.ToString();
             SettingsFormDFF.checkHotkeysFrostAMSPercent.Text = FrostAMSHPPercent.ToString();
-
-			try
-			{
-			}
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-
+            SettingsFormDFF.checkHotkeysFrostIceboundFortitude.Checked = isCheckHotkeysFrostIceboundFortitude;
+            SettingsFormDFF.checkHotkeysFrostIFPercent.Text = FrostIceboundHPPercent.ToString();
+            SettingsFormDFF.checkHotkeysFrostDeathstrike.Checked = isCheckHotkeysFrostDeathstrike;
+            SettingsFormDFF.checkHotkeysFrostDeathstrikePercent.Text = FrostDeathstrikeHPPercent.ToString();
+            SettingsFormDFF.checkHotkeysFrostFreeDeathstrike.Checked = isCheckHotkeysFrostFreeDeathstrike;
+            SettingsFormDFF.checkHotkeysFrostFreeDeathstrikePercent.Text = FrostFreeDeathstrikeHPPercent.ToString();
+            SettingsFormDFF.checkHotkeysFrostKick.Checked = isCheckHotkeysFrostKick;
+            SettingsFormDFF.checkHotkeysFrostKickPercent.Text = FrostKickPercent.ToString();
+            SettingsFormDFF.checkHotkeyslegyring.Checked = isCheckHotkeyslegyring;
+            SettingsFormDFF.checkHotkeysRacials.Checked = isCheckHotkeysRacials;
+			
             SettingsFormDFF.checkHotkeysFrostIceboundFortitude.CheckedChanged += isCheckHotkeysFrostIceboundFortitude_Click;
-            SettingsFormDFF.checkHotkeyslegyring.CheckedChanged += isCheckHotkeyslegyring_Click;
-            SettingsFormDFF.checkHotkeysFrostIFPercent.TextChanged += isCheckHotkeysFrostIFPercent_Click;
+            SettingsFormDFF.checkHotkeysFrostIFPercent.TextChanged += isCheckHotkeysFrostIFPercent_Click;	
+            SettingsFormDFF.checkHotkeysFrostDeathstrike.CheckedChanged += isCheckHotkeysFrostDeathstrike_Click;
+            SettingsFormDFF.checkHotkeysFrostDeathstrikePercent.TextChanged += isCheckHotkeysFrostDeathstrikePercent_Click;
+            SettingsFormDFF.checkHotkeysFrostFreeDeathstrike.CheckedChanged += isCheckHotkeysFrostFreeDeathstrike_Click;
+            SettingsFormDFF.checkHotkeysFrostFreeDeathstrikePercent.TextChanged += isCheckHotkeysFrostFreeDeathstrikePercent_Click;
+            SettingsFormDFF.checkHotkeysFrostKick.CheckedChanged += isCheckHotkeysFrostKick_Click;
+            SettingsFormDFF.checkHotkeysFrostKickPercent.TextChanged += isCheckHotkeysFrostKickPercent_Click;
             SettingsFormDFF.checkHotkeysFrostAntiMagicShield.CheckedChanged += isCheckHotkeysFrostAntiMagicShield_Click;
             SettingsFormDFF.checkHotkeysFrostAMSPercent.TextChanged += isCheckHotkeysFrostAMSPercent_Click;
+            SettingsFormDFF.checkHotkeyslegyring.CheckedChanged += isCheckHotkeyslegyring_Click;
+            SettingsFormDFF.checkHotkeysRacials.CheckedChanged += isCheckHotkeysRacials_Click;
             SettingsFormDFF.checkHotkeysFrostOffensivePillarofFrost.CheckedChanged += isCheckHotkeysFrostOffensivePillarofFrost_Click;
             SettingsFormDFF.checkHotkeysFrostOffensiveErW.CheckedChanged += isCheckHotkeysFrostOffensiveErW_Click;
             SettingsFormDFF.btnHotkeysFrostOffensiveCooldowns.KeyDown += KeyDown;
@@ -274,11 +382,6 @@ namespace CloudMagic.Rotation
             isCheckHotkeysFrostIceboundFortitude = SettingsFormDFF.checkHotkeysFrostIceboundFortitude.Checked;
         }
 		
-        private void isCheckHotkeyslegyring_Click(object sender, EventArgs e)
-        {
-            isCheckHotkeyslegyring = SettingsFormDFF.checkHotkeyslegyring.Checked;
-        }
-
         private void isCheckHotkeysFrostIFPercent_Click(object sender, EventArgs e)
         {
             int userVal;
@@ -292,7 +395,64 @@ namespace CloudMagic.Rotation
                 Log.Write("Enter a number between 0 and 100 in the text box", Color.DarkRed);
             }
         }
-
+		
+        private void isCheckHotkeysFrostDeathstrike_Click(object sender, EventArgs e)
+        {
+            isCheckHotkeysFrostDeathstrike = SettingsFormDFF.checkHotkeysFrostDeathstrike.Checked;
+        }
+		
+        private void isCheckHotkeysFrostDeathstrikePercent_Click(object sender, EventArgs e)
+        {
+            int userVal;
+            if (int.TryParse(SettingsFormDFF.checkHotkeysFrostDeathstrikePercent.Text, out userVal) && userVal >= 0 && userVal <= 100)
+            {
+                FrostDeathstrikeHPPercent = userVal;
+            }
+            else
+            {
+                SettingsFormDFF.checkHotkeysFrostDeathstrikePercent.Text = "";
+                Log.Write("Enter a number between 0 and 100 in the text box", Color.DarkRed);
+            }
+        }
+		
+        private void isCheckHotkeysFrostFreeDeathstrike_Click(object sender, EventArgs e)
+        {
+            isCheckHotkeysFrostFreeDeathstrike = SettingsFormDFF.checkHotkeysFrostFreeDeathstrike.Checked;
+        }
+		
+        private void isCheckHotkeysFrostFreeDeathstrikePercent_Click(object sender, EventArgs e)
+        {
+            int userVal;
+            if (int.TryParse(SettingsFormDFF.checkHotkeysFrostFreeDeathstrikePercent.Text, out userVal) && userVal >= 0 && userVal <= 100)
+            {
+                FrostFreeDeathstrikeHPPercent = userVal;
+            }
+            else
+            {
+                SettingsFormDFF.checkHotkeysFrostFreeDeathstrikePercent.Text = "";
+                Log.Write("Enter a number between 0 and 100 in the text box", Color.DarkRed);
+            }
+        }
+		
+        private void isCheckHotkeysFrostKick_Click(object sender, EventArgs e)
+        {
+            isCheckHotkeysFrostKick = SettingsFormDFF.checkHotkeysFrostKick.Checked;
+        }
+		
+        private void isCheckHotkeysFrostKickPercent_Click(object sender, EventArgs e)
+        {
+            int userVal;
+            if (int.TryParse(SettingsFormDFF.checkHotkeysFrostKickPercent.Text, out userVal) && userVal >= 0 && userVal <= 100)
+            {
+                FrostKickPercent = userVal;
+            }
+            else
+            {
+                SettingsFormDFF.checkHotkeysFrostKickPercent.Text = "";
+                Log.Write("Enter a number between 0 and 100 in the text box", Color.DarkRed);
+            }
+        }
+		
         private void isCheckHotkeysFrostAntiMagicShield_Click(object sender, EventArgs e)
         {
             isCheckHotkeysFrostAntiMagicShield = SettingsFormDFF.checkHotkeysFrostAntiMagicShield.Checked;
@@ -312,6 +472,16 @@ namespace CloudMagic.Rotation
             }
         }
 
+        private void isCheckHotkeyslegyring_Click(object sender, EventArgs e)
+        {
+            isCheckHotkeyslegyring = SettingsFormDFF.checkHotkeyslegyring.Checked;
+        }
+		
+        private void isCheckHotkeysRacials_Click(object sender, EventArgs e)
+        {
+            isCheckHotkeysRacials = SettingsFormDFF.checkHotkeysRacials.Checked;
+        }
+		
         private void isCheckHotkeysFrostOffensivePillarofFrost_Click(object sender, EventArgs e)
         {
             isCheckHotkeysFrostOffensivePillarofFrost = SettingsFormDFF.checkHotkeysFrostOffensivePillarofFrost.Checked;
@@ -327,17 +497,6 @@ namespace CloudMagic.Rotation
         {
         }
 
-
-        public static bool CanCastInRange(string spell)
-        {
-            return WoW.CanCast(spell, false, false, true, false, false);
-        }
-
-        public static bool CanCastNoRange(string spell)
-        {
-            return !WoW.IsSpellOnCooldown(spell);
-        }
-
         public override void Pulse()
         {
             if (!coolDownStopWatch.IsRunning || coolDownStopWatch.ElapsedMilliseconds > 60000)
@@ -350,318 +509,245 @@ namespace CloudMagic.Rotation
                     coolDownStopWatch.Restart();
                 }
             }
-            if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.TargetIsVisible)
+            if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.TargetIsVisible && !WoW.IsMounted)
             {
-                isMelee = WoW.CanCast("Obliterate", false, false, true, false, false);
-                currentRunes = WoW.CurrentRunes;
-                runicPower = WoW.RunicPower;
-                if (WoW.TargetIsCasting && WoW.TargetIsCastingAndSpellIsInterruptible && WoW.TargetPercentCast >= 40 && WoW.Level >= 62 && WoW.CanCast("Mind Freeze", false, true, true, false, false) &&
-                    isCastingListedSpell())
-                {
-                    WoW.CastSpell("Mind Freeze");
-                }
-                if (WoW.CanCast("Sindragosa's Fury") && (DetectKeyPress.GetKeyState(0x5A) < 0) && WoW.Level >= 110)
+                if (WoW.CanCast("Sindragosa's Fury") && DetectKeyPress.GetKeyState(0x5A) < 0 )
                 {																
                     WoW.CastSpell("Sindragosa's Fury");
                     return;
                 }
-                if (CanCastNoRange("Anti-Magic Shell") && WoW.HealthPercent <= FrostAMSHPPercent && !WoW.IsSpellOnCooldown("Anti-Magic Shell") && isCheckHotkeysFrostIceboundFortitude && WoW.Level >= 57)
+                if (WoW.CanCast("Mind Freeze") && isCheckHotkeysFrostKick && WoW.TargetIsCastingAndSpellIsInterruptible && WoW.TargetPercentCast >= FrostKickPercent && !WoW.IsSpellOnCooldown("Mind Freeze") && !WoW.PlayerIsChanneling)
+                {
+                    WoW.CastSpell("Mind Freeze");						
+                    return;
+                }
+                if (!WoW.IsSpellOnCooldown("Anti-Magic Shell") && WoW.HealthPercent <= FrostAMSHPPercent && !WoW.IsSpellOnCooldown("Anti-Magic Shell") && isCheckHotkeysFrostAntiMagicShield)
                 {
                     WoW.CastSpell("Anti-Magic Shell");
                 }
-                if (CanCastNoRange("Icebound Fortitude") && WoW.HealthPercent < FrostIceboundHPPercent && !WoW.IsSpellOnCooldown("Icebound Fortitude") && isCheckHotkeysFrostAntiMagicShield && WoW.Level >= 65)
+                if (!WoW.IsSpellOnCooldown("Icebound Fortitude") && WoW.HealthPercent < FrostIceboundHPPercent && !WoW.IsSpellOnCooldown("Icebound Fortitude") && isCheckHotkeysFrostIceboundFortitude)
                 {
                     WoW.CastSpell("Icebound Fortitude");
                 }
-                if (useChainofIce && CanCastInRange("ChainofIce") && !isMelee && !WoW.TargetHasDebuff("ChainofIce") && currentRunes >= 1 && WoW.Level >= 63)
-                {
-                    WoW.CastSpell("ChainofIce");
-                    return;
-                }
-                if (WoW.Talent(7) == 2)
-                {
-                    BreathRotation();
-                }
-                else
-                    MGRotation();
+				if (WoW.CanCast("Obliterate", false, false, true, false, false) && isCheckHotkeysFrostFreeDeathstrike && WoW.HealthPercent <= FrostFreeDeathstrikeHPPercent && WoW.PlayerHasBuff("Free DeathStrike"))
+				{
+					WoW.CastSpell("Death Strike");
+					return;
+				}
+				if (WoW.CanCast("Obliterate", false, false, true, false, false) && isCheckHotkeysFrostDeathstrike && WoW.HealthPercent <= FrostDeathstrikeHPPercent && WoW.RunicPower >=45)
+				{
+					WoW.CastSpell("Death Strike");
+					return;
+				}
             }
-        }
-
-        public void BreathRotation()
-        {
-            hasBreath = WoW.PlayerHasBuff("Breath");
-            if (combatRoutine.UseCooldowns && isCheckHotkeysFrostOffensivePillarofFrost && !WoW.IsSpellOnCooldown("PillarofFrost") && hasBreath && WoW.Level >= 57)
-            {
-                WoW.CastSpell("PillarofFrost");
-            }
-            if (combatRoutine.UseCooldowns && isCheckHotkeysFrostOffensivePillarofFrost && !WoW.IsSpellOnCooldown("PillarofFrost") && !hasBreath && WoW.SpellCooldownTimeRemaining("Breath") >= 5900 && WoW.Level >= 57)
-            {
-                WoW.CastSpell("PillarofFrost");
-            }
-            if ((haveCoF || useNextHRWCharge) && isCheckHotkeyslegyring && haveHRW && runicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.PlayerHasBuff("HEmpower Rune") && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath && legyringtest == true && WoW.Level >= 58)
-            {
-                useNextHRWCharge = false;
-                WoW.CastSpell("HEmpower Rune");
-				legyringtest = false;
-            }
-            if ((haveCoF || useNextHRWCharge) && !isCheckHotkeyslegyring && haveHRW && runicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.PlayerHasBuff("HEmpower Rune") && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath && WoW.Level >= 58)
-            {
-                useNextHRWCharge = false;
-                WoW.CastSpell("HEmpower Rune");
-            }
-			if (isCheckHotkeyslegyring && !WoW.PlayerHasBuff("Breath"))
+			if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave || combatRoutine.Type == RotationType.AOE)
 			{
-				legyringtest = true;
-			}
-            if ((haveCoF || useNextHRWCharge) && !haveHRW && runicPower <= 50 && currentRunes <=1 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("HEmpower Rune") && hasBreath && WoW.Level >= 57)
-            {
-                WoW.CastSpell("Empower Rune");
+				if (WoW.Talent(7) == 2 && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.TargetIsVisible && !WoW.IsMounted)
+				{
+					if (combatRoutine.UseCooldowns && isCheckHotkeysFrostOffensivePillarofFrost && !WoW.IsSpellOnCooldown("PillarofFrost") && WoW.PlayerHasBuff("Breath"))
+					{
+						WoW.CastSpell("PillarofFrost");
+					}
+					if (combatRoutine.UseCooldowns && isCheckHotkeysFrostOffensivePillarofFrost && !WoW.IsSpellOnCooldown("PillarofFrost") && !WoW.PlayerHasBuff("Breath") && WoW.SpellCooldownTimeRemaining("Breath") >= 5900)
+					{
+						WoW.CastSpell("PillarofFrost");
+					}
+					if ((haveCoF || useNextHRWCharge) && isCheckHotkeyslegyring && haveHRW && WoW.RunicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.PlayerHasBuff("HEmpower Rune") && !WoW.IsSpellOnCooldown("HEmpower Rune") && WoW.PlayerHasBuff("Breath") && legyringtest == true )
+					{
+						useNextHRWCharge = false;
+						WoW.CastSpell("HEmpower Rune");
+						legyringtest = false;
+					}
+					if ((haveCoF || useNextHRWCharge) && !isCheckHotkeyslegyring && haveHRW && WoW.RunicPower <= 30 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.PlayerHasBuff("HEmpower Rune") && !WoW.IsSpellOnCooldown("HEmpower Rune") && WoW.PlayerHasBuff("Breath"))
+					{
+						useNextHRWCharge = false;
+						WoW.CastSpell("HEmpower Rune");
+					}
+					if (isCheckHotkeyslegyring && !WoW.PlayerHasBuff("Breath"))
+					{
+						legyringtest = true;
+					}
+					if (WoW.CanCast("Arcane Torrent") && WoW.PlayerRace == "BloodElf" && WoW.RunicPower <= 25 && combatRoutine.UseCooldowns && isCheckHotkeysRacials && WoW.PlayerHasBuff("Breath") && !WoW.PlayerHasBuff("HEmpower Rune") && WoW.CanCast("Obliterate", false, false, true, false, false))
+                    {
+                        WoW.CastSpell("Arcane Torrent");
+                        return;
+                    }
+					if (WoW.CanCast("Blood Fury") && combatRoutine.UseCooldowns && isCheckHotkeysRacials && !WoW.IsSpellOnCooldown ("Blood Fury") && WoW.PlayerRace == "Orc" && WoW.PlayerHasBuff("Breath") && WoW.CanCast("Obliterate", false, false, true, false, false))
+                    {
+                        WoW.CastSpell("Blood Fury");
+                        return;
+                    }
+					if (WoW.CanCast("Berserking") && combatRoutine.UseCooldowns && isCheckHotkeysRacials && !WoW.IsSpellOnCooldown ("Berserking") && WoW.PlayerRace == "Troll" && WoW.PlayerHasBuff("Breath") && WoW.CanCast("Obliterate", false, false, true, false, false))
+                    {
+                        WoW.CastSpell("Berserking");
+                        return;
+                    }
+					if ((haveCoF || useNextHRWCharge) && !haveHRW && WoW.RunicPower <= 50 && WoW.CurrentRunes <=1 && isCheckHotkeysFrostOffensiveErW && combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("HEmpower Rune") && WoW.PlayerHasBuff("Breath"))
+					{
+						WoW.CastSpell("Empower Rune");
+					}
+					if (combatRoutine.UseCooldowns && WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 2 && WoW.RunicPower >= 70 && !WoW.IsSpellOnCooldown("Breath"))
+					{
+						WoW.CastSpell("Breath");
+						useNextHRWCharge = true;
+						return;
+					}
+					if (!WoW.TargetHasDebuff("Frost Fever") && WoW.CurrentRunes >= 1 && !WoW.PlayerHasBuff("Breath") && WoW.CanCast("Howling Blast", false, false, true, false, false) && !WoW.IsSpellOnCooldown("Howling Blast"))
+					{
+						WoW.CastSpell("Howling Blast");
+						return;
+					}
+					if (WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 1 && ((WoW.RunicPower >= 48 && WoW.PlayerHasBuff("Breath")) || !WoW.PlayerHasBuff("Breath")) && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 1500)) && !WoW.IsSpellOnCooldown("Remorseless Winter"))
+					{
+						WoW.CastSpell("Remorseless Winter");
+						return;
+					}
+					if (((WoW.RunicPower >= 46 && WoW.PlayerHasBuff("Breath")) || !WoW.PlayerHasBuff("Breath")) && WoW.CanCast("Howling Blast", false, false, true, false, false) && WoW.PlayerHasBuff("Rime"))
+					{
+						WoW.CastSpell("Howling Blast");
+						return;
+					}
+					if (WoW.Talent(6) != 1 && WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Breath") && WoW.PlayerHasBuff("Gathering Storm"))
+					{
+						WoW.CastSpell("Obliterate");
+						return;
+					}
+					if (WoW.RunicPower >= 70 && !WoW.PlayerHasBuff("Breath") && WoW.CanCast("Frost Strike", false, false, true, false, false))
+					{
+						WoW.CastSpell("Frost Strike");
+						return;
+					}
+					if (WoW.Talent(6) == 1 && WoW.CanCast("Frost Strike", false, false, true, false, false) && WoW.CurrentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine") && !WoW.PlayerHasBuff("Breath"))
+					{
+						WoW.CastSpell("Frostscythe");
+						return;
+					}
+					if (WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 2 && (!WoW.PlayerHasBuff("Breath") || (WoW.PlayerHasBuff("Breath") && (WoW.RunicPower <= 70 || WoW.PlayerHasBuff("Breath") && WoW.CurrentRunes > 3))))
+					{
+						WoW.CastSpell("Obliterate");
+						return;
+					}
+					if (WoW.RunicPower >= 25 && WoW.CanCast("Frost Strike", false, false, true, false, false) && !WoW.PlayerHasBuff("Breath") && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 1500)))
+					{
+						WoW.CastSpell("Frost Strike");
+						return;
+					}
+					if (WoW.Talent(2) == 3 && WoW.CurrentRunes <= 4 && WoW.RunicPower <= 70 && !WoW.IsSpellOnCooldown("Horn") && !WoW.PlayerHasBuff("HEmpower Rune") && (WoW.PlayerHasBuff("Breath") || (!WoW.PlayerHasBuff("Breath") && WoW.SpellCooldownTimeRemaining("Breath") >= 1500)))
+					{
+						WoW.CastSpell("Horn");
+					}
+				}
+				if (WoW.Talent(7) != 2 && WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.TargetIsVisible && !WoW.IsMounted)
+				{
+					if (isCheckHotkeysFrostOffensivePillarofFrost && WoW.CanCast("Obliterate", false, false, true, false, false) && combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("PillarofFrost"))
+					{
+						WoW.CastSpell("PillarofFrost");
+					}
+					if (combatRoutine.UseCooldowns && isCheckHotkeysFrostOffensiveErW && WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes == 0 && WoW.PlayerHasBuff("PillarofFrost") && !WoW.IsSpellOnCooldown("Empower Rune"))
+					{
+						WoW.CastSpell("Empower Rune");
+					}
+					if (WoW.CanCast("Arcane Torrent") && combatRoutine.UseCooldowns && isCheckHotkeysRacials && WoW.PlayerRace == "BloodElf" && WoW.RunicPower <= 30 && WoW.PlayerHasBuff("PillarofFrost") && WoW.CanCast("Obliterate", false, false, true, false, false))
+                    {
+                        WoW.CastSpell("Arcane Torrent");
+                        return;
+                    }
+					if (WoW.CanCast("Blood Fury") && combatRoutine.UseCooldowns && isCheckHotkeysRacials && !WoW.IsSpellOnCooldown ("Blood Fury") && WoW.PlayerRace == "Orc" && WoW.PlayerHasBuff("PillarofFrost") && WoW.CanCast("Obliterate", false, false, true, false, false))
+                    {
+                        WoW.CastSpell("Blood Fury");
+                        return;
+                    }
+					if (WoW.CanCast("Berserking") && combatRoutine.UseCooldowns && isCheckHotkeysRacials && !WoW.IsSpellOnCooldown ("Berserking") && WoW.PlayerRace == "Troll" && WoW.PlayerHasBuff("PillarofFrost") && WoW.CanCast("Obliterate", false, false, true, false, false))
+                    {
+                        WoW.CastSpell("Berserking");
+                        return;
+                    }
+					if (WoW.CanCast("Frost Strike", false, false, true, false, false) && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 200) && WoW.RunicPower >= 25 && !(combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("Obliteration") && WoW.Talent(7) == 1) && (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
+					{
+						Log.Write("Hasbuff " + WoW.PlayerHasBuff("Icy Talons") + " Remaining " + WoW.PlayerBuffTimeRemaining("Icy Talons"));
+						WoW.CastSpell("Frost Strike");
+						return;
+					}
+					if (WoW.CanCast("Howling Blast", false, false, true, false, false) && !WoW.IsSpellOnCooldown("Howling Blast") && !WoW.TargetHasDebuff("Frost Fever") && WoW.CurrentRunes >= 1 && (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
+					{
+						WoW.CastSpell("Howling Blast");
+						return;
+					}
+					if (WoW.Talent(6) == 1 && WoW.RunicPower >= 80 && WoW.CanCast("Frost Strike", false, false, true, false, false))
+					{
+						WoW.CastSpell("Frost Strike");
+						return;
+					}
+					if (WoW.CanCast("Howling Blast", false, false, true, false, false) && WoW.PlayerHasBuff("Rime") && (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
+					{
+						WoW.CastSpell("Howling Blast");
+						return;
+					}
+					if (combatRoutine.UseCooldowns && WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 2 && WoW.RunicPower >= 25 && WoW.Talent(7) == 1 && !WoW.IsSpellOnCooldown("Obliteration"))
+					{
+						WoW.CastSpell("Obliteration");
+						return;
+					}
+					if (WoW.Talent(7) == 1 && WoW.RunicPower >= 25 && WoW.CanCast("Frost Strike", false, false, true, false, false) && WoW.PlayerHasBuff("Obliteration") && !WoW.PlayerHasBuff("Killing Machine"))
+					{
+						WoW.CastSpell("Frost Strike");
+						return;
+					}
+					if (WoW.Talent(7) == 1 && WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine") && WoW.PlayerHasBuff("Obliteration"))
+					{
+						WoW.CastSpell("Obliterate");
+						return;
+					}
+					if (WoW.Talent(6) == 1 && WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine"))
+					{
+						WoW.CastSpell("Frostscythe");
+						return;
+					}
+					if (WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 2)
+					{
+						WoW.CastSpell("Obliterate");
+						return;
+					}
+					if (WoW.Talent(7) == 3 && WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 1 && !WoW.IsSpellOnCooldown("Glacial Advance"))
+					{
+						WoW.CastSpell("Glacial Advance");
+						return;
+					}
+					if (WoW.Talent(7) == 1 && WoW.RunicPower >= 40 && WoW.CanCast("Frost Strike", false, false, true, false, false) && !(combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("Obliteration")) && WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))
+					{
+						WoW.CastSpell("Frost Strike");
+						return;
+					}
+					if (WoW.CanCast("Obliterate", false, false, true, false, false) && WoW.CurrentRunes >= 1 && !WoW.IsSpellOnCooldown("Remorseless Winter") && (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
+					{
+						WoW.CastSpell("Remorseless Winter");
+						return;
+					}
+				}
             }
-            if (combatRoutine.UseCooldowns && isMelee && currentRunes >= 2 && runicPower >= 70 && CanCastNoRange("Breath") && WoW.Level >= 100)
-            {
-                WoW.CastSpell("Breath");
-                useNextHRWCharge = true;
-                return;
-            }
-            if (combatRoutine.UseCooldowns && isMelee && runicPower >= 70 && CanCastNoRange("Breath"))
-            {
-                return;
-            }
-            if (!WoW.TargetHasDebuff("Frost Fever") && currentRunes >= 1 && !hasBreath && CanCastInRange("Howling Blast") && !WoW.IsSpellOnCooldown("Howling Blast") && WoW.Level >= 55)
-            {
-                WoW.CastSpell("Howling Blast");
-                return;
-            }
-            if (isMelee && currentRunes >= 1 && WoW.Level >= 57 && ((runicPower >= 48 && hasBreath) || !hasBreath) && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 1500)) && CanCastNoRange("Remorseless Winter"))
-            {
-                WoW.CastSpell("Remorseless Winter");
-                return;
-            }
-            if (((runicPower >= 46 && hasBreath) || !hasBreath) && CanCastInRange("Howling Blast") && WoW.PlayerHasBuff("Rime") && WoW.Level >= 55)
-            {
-                WoW.CastSpell("Howling Blast");
-                return;
-            }
-            if (WoW.Talent(6) != 1 && isMelee && currentRunes >= 2 && !hasBreath && WoW.PlayerHasBuff("Gathering Storm") && WoW.Level >= 55)
-            {
-                WoW.CastSpell("Obliterate");
-                return;
-            }
-            if (runicPower >= 70 && !hasBreath && CanCastInRange("Frost Strike"))
-            {
-                WoW.CastSpell("Frost Strike");
-                return;
-            }
-            if (WoW.Talent(6) == 1 && CanCastInRange("Frost Strike") && currentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine") && !hasBreath && WoW.Level >= 90)
-            {
-                WoW.CastSpell("Frostscythe");
-                return;
-            }
-
-            if (isMelee && currentRunes >= 2 && WoW.Level >= 55 && (!hasBreath || (hasBreath && (runicPower <= 70 || hasBreath && currentRunes > 3))))
-            {
-                WoW.CastSpell("Obliterate");
-                return;
-            }
-            if (runicPower >= 25 && CanCastInRange("Frost Strike") && !hasBreath && (!combatRoutine.UseCooldowns || (combatRoutine.UseCooldowns && WoW.SpellCooldownTimeRemaining("Breath") >= 1500)))
-            {
-                WoW.CastSpell("Frost Strike");
-                return;
-            }
-            if (WoW.Talent(2) == 3 && currentRunes <= 4 && runicPower <= 70 && WoW.Level >= 57 && CanCastNoRange("Horn") && !WoW.PlayerHasBuff("HEmpower Rune") && (hasBreath || (!hasBreath && WoW.SpellCooldownTimeRemaining("Breath") >= 1500)))
-            {
-                WoW.CastSpell("Horn");
-            }
-            if (isMelee && WoW.HealthPercent <= 40 && WoW.PlayerHasBuff("Free DeathStrike") && !hasBreath && WoW.Level >= 55)
-            {
-                WoW.CastSpell("Death Strike");
-                return;
-            }
-        }
-        public void MGRotation()
-        {
-            if (isCheckHotkeysFrostOffensivePillarofFrost && isMelee && combatRoutine.UseCooldowns && !WoW.IsSpellOnCooldown("PillarofFrost") && WoW.Level >= 57)
-            {
-                WoW.CastSpell("PillarofFrost");
-            }
-            if (combatRoutine.UseCooldowns && isCheckHotkeysFrostOffensiveErW && isMelee && currentRunes == 0 && WoW.PlayerHasBuff("PillarofFrost") && !WoW.IsSpellOnCooldown("Empower Rune") && WoW.Level >= 57)
-            {
-                WoW.CastSpell("Empower Rune");
-            }
-            if (combatRoutine.Type == RotationType.SingleTarget || combatRoutine.Type == RotationType.SingleTargetCleave) // Do Single Target Stuff here
-            {
-                if (CanCastInRange("Frost Strike") && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 200) && runicPower >= 25 &&
-                    !(combatRoutine.UseCooldowns && CanCastNoRange("Obliteration") && WoW.Talent(7) == 1) &&
-                    (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
-                {
-                    Log.Write("Hasbuff " + WoW.PlayerHasBuff("Icy Talons") + " Remaining " + WoW.PlayerBuffTimeRemaining("Icy Talons"));
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (isMelee && WoW.HealthPercent <= 40 && WoW.Level >= 55 && WoW.PlayerHasBuff("Free DeathStrike") && (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
-                {
-                    WoW.CastSpell("Death Strike");
-                    return;
-                }
-                if (CanCastInRange("Howling Blast") && !WoW.IsSpellOnCooldown("Howling Blast") && WoW.Level >= 55 && !WoW.TargetHasDebuff("Frost Fever") && currentRunes >= 1 &&
-                    (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
-                {
-                    WoW.CastSpell("Howling Blast");
-                    return;
-                }
-                if (WoW.Talent(6) == 1 && runicPower >= 80 && CanCastInRange("Frost Strike"))
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (CanCastInRange("Howling Blast") && WoW.PlayerHasBuff("Rime") && WoW.Level >= 55 && (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
-                {
-                    WoW.CastSpell("Howling Blast");
-                    return;
-                }
-
-                if (combatRoutine.UseCooldowns && isMelee && currentRunes >= 2 && runicPower >= 25 && WoW.Talent(7) == 1 && CanCastNoRange("Obliteration") && WoW.Level >= 100)
-                {
-                    WoW.CastSpell("Obliteration");
-                    return;
-                }
-                if (WoW.Talent(7) == 1 && runicPower >= 25 && CanCastInRange("Frost Strike") && WoW.PlayerHasBuff("Obliteration") && !WoW.PlayerHasBuff("Killing Machine"))
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-
-                if (WoW.Talent(7) == 1 && isMelee && currentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine") && WoW.PlayerHasBuff("Obliteration") && WoW.Level >= 55)
-                {
-                    WoW.CastSpell("Obliterate");
-                    return;
-                }
-                if (WoW.Talent(6) == 1 && isMelee && currentRunes >= 1 && WoW.PlayerHasBuff("Killing Machine") && WoW.Level >= 90)
-                {
-                    WoW.CastSpell("Frostscythe");
-                    return;
-                }
-
-                if (isMelee && currentRunes >= 2 && WoW.Level >= 55)
-                {
-                    WoW.CastSpell("Obliterate");
-                    return;
-                }
-                if (WoW.Talent(7) == 3 && isMelee && currentRunes >= 1 && CanCastNoRange("Glacial Advance") && WoW.Level >= 100)
-                {
-                    WoW.CastSpell("Glacial Advance");
-                    return;
-                }
-                if (WoW.Talent(7) == 1 && runicPower >= 40 && CanCastInRange("Frost Strike") && !(combatRoutine.UseCooldowns && CanCastNoRange("Obliteration")) && WoW.Talent(7) == 1 &&
-                    !WoW.PlayerHasBuff("Obliteration"))
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (isMelee && currentRunes >= 1 && CanCastNoRange("Remorseless Winter") && WoW.Level >= 57 && (WoW.Talent(7) != 1 || (WoW.Talent(7) == 1 && !WoW.PlayerHasBuff("Obliteration"))))
-                {
-                    WoW.CastSpell("Remorseless Winter");
-                    return;
-                }
-            }
-            if (combatRoutine.Type == RotationType.AOE)
-            {
-                if (CanCastInRange("Frost Strike") && (!WoW.PlayerHasBuff("Icy Talons") || WoW.PlayerBuffTimeRemaining("Icy Talons") <= 200) && runicPower >= 25)
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (isMelee && WoW.HealthPercent <= 40 && WoW.PlayerHasBuff("Free DeathStrike") && WoW.Level >= 55)
-                {
-                    WoW.CastSpell("Death Strike");
-                    return;
-                }
-                if (CanCastInRange("Howling Blast") && !WoW.IsSpellOnCooldown("Howling Blast") && !WoW.TargetHasDebuff("Frost Fever") && currentRunes >= 1 && WoW.Level >= 55)
-                {
-                    WoW.CastSpell("Howling Blast");
-                    return;
-                }
-                if (CanCastInRange("Howling Blast") && WoW.PlayerHasBuff("Rime") && WoW.Level >= 55)
-                {
-                    WoW.CastSpell("Howling Blast");
-                    return;
-                }
-                if (WoW.Talent(6) != 1 && isMelee && currentRunes >= 1 && CanCastNoRange("Remorseless Winter") && WoW.Level >= 57)
-                {
-                    WoW.CastSpell("Remorseless Winter");
-                    return;
-                }
-                if (runicPower >= 80 && CanCastInRange("Frost Strike"))
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-                if (WoW.Talent(6) != 1 && isMelee && currentRunes >= 2 && WoW.Level >= 55)
-                {
-                    WoW.CastSpell("Obliterate");
-                    return;
-                }
-                if (WoW.Talent(6) == 1 && currentRunes >= 1 && isMelee && WoW.PlayerHasBuff("Killing Machine") && WoW.Level >= 90)
-                {
-                    WoW.CastSpell("Frostscythe");
-                    return;
-                }
-                if (WoW.Talent(7) == 3 && isMelee && currentRunes >= 1 && CanCastNoRange("Glacial Advance") && WoW.Level >= 100)
-                {
-                    WoW.CastSpell("Glacial Advance");
-                    return;
-                }
-                if (isMelee && currentRunes >= 1 && CanCastNoRange("Remorseless Winter") && WoW.Level >= 57)
-                {
-                    WoW.CastSpell("Remorseless Winter");
-                    return;
-                }
-                if (WoW.Talent(6) == 1 && isMelee && currentRunes >= 1 && WoW.Level >= 90)
-                {
-                    WoW.CastSpell("Frostscythe");
-                    return;
-                }
-
-                if (runicPower >= 25 && CanCastInRange("Frost Strike") && WoW.PlayerBuffStacks("Icy Talons") < 3)
-                {
-                    WoW.CastSpell("Frost Strike");
-                    return;
-                }
-				
-				if (WoW.CanCast("Sindragosa's Fury") && (DetectKeyPress.GetKeyState(0x5A) < 0) && WoW.Level >= 110)
-                {																
-                    WoW.CastSpell("Sindragosa's Fury");
-                    return;
-                }
-            }
-        }
-
-        public bool isCastingListedSpell()
-        {
-            foreach (string spellid in SettingsFormDFF.spellList.Items)
-            {
-                var spellidint = int.Parse(spellid);
-                if (WoW.TargetCastingSpellID == spellidint)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 
     public class SettingsFormDFF : Form
     {
-        public Button btnaddspell;
         public Button btnHotkeysFrostOffensiveCooldowns;
-        public Button btnremovespell;
         public TextBox checkHotkeysFrostAMSPercent;
         private readonly Label checkHotkeysFrostAMSPercentLabel;
         public CheckBox checkHotkeysFrostAntiMagicShield;
         public CheckBox checkHotkeysFrostIceboundFortitude;
-        public CheckBox checkHotkeyslegyring;
         public TextBox checkHotkeysFrostIFPercent;
         public Label checkHotkeysFrostIFPercentLabel;
+        public CheckBox checkHotkeysFrostDeathstrike;
+        public TextBox checkHotkeysFrostDeathstrikePercent;
+        public Label checkHotkeysFrostDeathstrikePercentLabel;
+        public CheckBox checkHotkeysFrostFreeDeathstrike;
+        public TextBox checkHotkeysFrostFreeDeathstrikePercent;
+        public Label checkHotkeysFrostFreeDeathstrikePercentLabel;
+        public CheckBox checkHotkeysFrostKick;
+        public TextBox checkHotkeysFrostKickPercent;
+        public Label checkHotkeysFrostKickPercentLabel;
+        public CheckBox checkHotkeyslegyring;
+        public CheckBox checkHotkeysRacials;
         public CheckBox checkHotkeysFrostOffensiveErW;
         public CheckBox checkHotkeysFrostOffensivePillarofFrost;
 
@@ -675,8 +761,6 @@ namespace CloudMagic.Rotation
         private readonly GroupBox groupBox13;
         private readonly GroupBox groupBox22;
         private readonly Label spellIdLabel;
-        public ListBox spellList;
-        public TextBox spellText;
         private readonly TabControl tabControl3;
         private readonly TabPage tabPage5;
 
@@ -689,21 +773,26 @@ namespace CloudMagic.Rotation
         /// </summary>
         public SettingsFormDFF()
         {
-            this.spellList = new System.Windows.Forms.ListBox();
-            this.spellText = new System.Windows.Forms.TextBox();
-            this.spellIdLabel = new System.Windows.Forms.Label();
-            this.btnaddspell = new System.Windows.Forms.Button();
-            this.btnremovespell = new System.Windows.Forms.Button();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.groupBox12 = new System.Windows.Forms.GroupBox();
             this.groupBox22 = new System.Windows.Forms.GroupBox();
             this.checkHotkeysFrostIceboundFortitude = new System.Windows.Forms.CheckBox();
-            this.checkHotkeyslegyring = new System.Windows.Forms.CheckBox();
-            this.checkHotkeysFrostAntiMagicShield = new System.Windows.Forms.CheckBox();
             this.checkHotkeysFrostIFPercent = new System.Windows.Forms.TextBox();
-            this.checkHotkeysFrostIFPercentLabel = new System.Windows.Forms.Label();
+            this.checkHotkeysFrostIFPercentLabel = new System.Windows.Forms.Label();	
+            this.checkHotkeysFrostDeathstrike = new System.Windows.Forms.CheckBox();
+            this.checkHotkeysFrostDeathstrikePercent = new System.Windows.Forms.TextBox();
+            this.checkHotkeysFrostDeathstrikePercentLabel = new System.Windows.Forms.Label();
+            this.checkHotkeysFrostFreeDeathstrike = new System.Windows.Forms.CheckBox();
+            this.checkHotkeysFrostFreeDeathstrikePercent = new System.Windows.Forms.TextBox();
+            this.checkHotkeysFrostFreeDeathstrikePercentLabel = new System.Windows.Forms.Label();
+            this.checkHotkeysFrostKick = new System.Windows.Forms.CheckBox();
+            this.checkHotkeysFrostKickPercent = new System.Windows.Forms.TextBox();
+            this.checkHotkeysFrostKickPercentLabel = new System.Windows.Forms.Label();
+            this.checkHotkeysFrostAntiMagicShield = new System.Windows.Forms.CheckBox();
             this.checkHotkeysFrostAMSPercent = new System.Windows.Forms.TextBox();
             this.checkHotkeysFrostAMSPercentLabel = new System.Windows.Forms.Label();
+            this.checkHotkeyslegyring = new System.Windows.Forms.CheckBox();
+            this.checkHotkeysRacials = new System.Windows.Forms.CheckBox();
             this.groupBox13 = new System.Windows.Forms.GroupBox();
             this.checkHotkeysFrostOffensiveErW = new System.Windows.Forms.CheckBox();
             this.checkHotkeysFrostOffensivePillarofFrost = new System.Windows.Forms.CheckBox();
@@ -719,54 +808,7 @@ namespace CloudMagic.Rotation
             this.btnaddspell = new System.Windows.Forms.Button();
             this.btnremovespell
             */
-            // 
-            // btnaddspell
-            // 
-            this.btnaddspell.Location = new System.Drawing.Point(110, 50);
-            this.btnaddspell.Name = "btnaddspell";
-            this.btnaddspell.Size = new System.Drawing.Size(28, 48);
-            this.btnaddspell.TabIndex = 1;
-            this.btnaddspell.Text = "+";
-            this.btnaddspell.UseVisualStyleBackColor = true;
 
-            // 
-            // btnremovespell
-            // 
-            this.btnremovespell.Location = new System.Drawing.Point(110, 100);
-            this.btnremovespell.Name = "btnremovespell";
-            this.btnremovespell.Size = new System.Drawing.Size(28, 48);
-            this.btnremovespell.TabIndex = 1;
-            this.btnremovespell.Text = "-";
-            this.btnremovespell.UseVisualStyleBackColor = true;
-            // 
-            // spellIdLabel
-            // 
-            this.spellIdLabel.AutoSize = true;
-            this.spellIdLabel.Location = new System.Drawing.Point(28, 28);
-            this.spellIdLabel.Name = "spellIdLabel";
-            this.spellIdLabel.Size = new System.Drawing.Size(28, 28);
-            this.spellIdLabel.TabIndex = 9;
-            this.spellIdLabel.Text = "Spell ID:";
-            // 
-            // spellText
-            // 
-            this.spellText.AutoSize = true;
-            this.spellText.Location = new System.Drawing.Point(28, 50);
-            this.spellText.Name = "spellText";
-            this.spellText.Size = new System.Drawing.Size(80, 28);
-            this.spellText.TabIndex = 9;
-            this.spellText.Text = "";
-
-            // 
-            // spellList
-            // 
-            this.spellList.AutoSize = false;
-            this.spellList.Location = new System.Drawing.Point(28, 75);
-            this.spellList.Name = "spellList";
-            this.spellList.Size = new System.Drawing.Size(80, 290);
-            this.spellList.TabIndex = 9;
-
-            this.spellList.Text = "spellList";
             // 
             // tabPage5
             // 
@@ -786,13 +828,22 @@ namespace CloudMagic.Rotation
             this.groupBox12.Controls.Add(this.checkHotkeysFrostIceboundFortitude);
             this.groupBox12.Controls.Add(this.checkHotkeysFrostIFPercent);
             this.groupBox12.Controls.Add(this.checkHotkeysFrostIFPercentLabel);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostDeathstrike);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostDeathstrikePercent);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostDeathstrikePercentLabel);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostFreeDeathstrike);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostFreeDeathstrikePercent);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostFreeDeathstrikePercentLabel);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostKick);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostKickPercent);
+            this.groupBox12.Controls.Add(this.checkHotkeysFrostKickPercentLabel);
             this.groupBox12.Controls.Add(this.checkHotkeysFrostAntiMagicShield);
             this.groupBox12.Controls.Add(this.checkHotkeysFrostAMSPercent);
             this.groupBox12.Controls.Add(this.checkHotkeysFrostAMSPercentLabel);
 
             this.groupBox12.Location = new System.Drawing.Point(8, 100);
             this.groupBox12.Name = "groupBox12";
-            this.groupBox12.Size = new System.Drawing.Size(561, 80);
+            this.groupBox12.Size = new System.Drawing.Size(561, 140);
             this.groupBox12.TabIndex = 2;
             this.groupBox12.TabStop = false;
             this.groupBox12.Text = "Defensive Cooldowns";
@@ -816,7 +867,7 @@ namespace CloudMagic.Rotation
             this.checkHotkeysFrostIFPercent.TabIndex = 9;
             this.checkHotkeysFrostIFPercent.Text = "50";
             // 
-            // checkHotkeysFrostIFPercent
+            // checkHotkeysFrostIFPercentLabel
             // 
             this.checkHotkeysFrostIFPercentLabel.AutoSize = true;
             this.checkHotkeysFrostIFPercentLabel.Location = new System.Drawing.Point(321, 30);
@@ -853,6 +904,93 @@ namespace CloudMagic.Rotation
             this.checkHotkeysFrostAMSPercentLabel.Size = new System.Drawing.Size(20, 28);
             this.checkHotkeysFrostAMSPercentLabel.TabIndex = 9;
             this.checkHotkeysFrostAMSPercentLabel.Text = "% HP";
+			
+            // 
+            // checkHotkeysFrostDeathstrike
+            // 
+            this.checkHotkeysFrostDeathstrike.AutoSize = true;
+            this.checkHotkeysFrostDeathstrike.Location = new System.Drawing.Point(151, 72);
+            this.checkHotkeysFrostDeathstrike.Name = "checkHotkeysFrostDeathstrike";
+            this.checkHotkeysFrostDeathstrike.Size = new System.Drawing.Size(100, 28);
+            this.checkHotkeysFrostDeathstrike.TabIndex = 9;
+            this.checkHotkeysFrostDeathstrike.Text = "Deathstrike";
+            this.checkHotkeysFrostDeathstrike.UseVisualStyleBackColor = true;
+            // 
+            // checkHotkeysFrostDeathstrikePercent
+            // 
+            this.checkHotkeysFrostDeathstrikePercent.AutoSize = true;
+            this.checkHotkeysFrostDeathstrikePercent.Location = new System.Drawing.Point(300, 72);
+            this.checkHotkeysFrostDeathstrikePercent.Name = "checkHotkeysFrostDeathstrikePercent";
+            this.checkHotkeysFrostDeathstrikePercent.Size = new System.Drawing.Size(20, 28);
+            this.checkHotkeysFrostDeathstrikePercent.TabIndex = 9;
+            this.checkHotkeysFrostDeathstrikePercent.Text = "50";
+            // 
+            // checkHotkeysFrostDeathstrikeLabel
+            // 
+            this.checkHotkeysFrostDeathstrikePercentLabel.AutoSize = true;
+            this.checkHotkeysFrostDeathstrikePercentLabel.Location = new System.Drawing.Point(321, 74);
+            this.checkHotkeysFrostDeathstrikePercentLabel.Name = "checkHotkeysFrostDeathstrikePercentLabel";
+            this.checkHotkeysFrostDeathstrikePercentLabel.Size = new System.Drawing.Size(20, 28);
+            this.checkHotkeysFrostDeathstrikePercentLabel.TabIndex = 9;
+            this.checkHotkeysFrostDeathstrikePercentLabel.Text = "% HP";
+			
+            // 
+            // checkHotkeysFrostFreeDeathstrike
+            // 
+            this.checkHotkeysFrostFreeDeathstrike.AutoSize = true;
+            this.checkHotkeysFrostFreeDeathstrike.Location = new System.Drawing.Point(151, 94);
+            this.checkHotkeysFrostFreeDeathstrike.Name = "checkHotkeysFrostFreeDeathstrike";
+            this.checkHotkeysFrostFreeDeathstrike.Size = new System.Drawing.Size(100, 28);
+            this.checkHotkeysFrostFreeDeathstrike.TabIndex = 9;
+            this.checkHotkeysFrostFreeDeathstrike.Text = "Free Deathstrike";
+            this.checkHotkeysFrostFreeDeathstrike.UseVisualStyleBackColor = true;
+            // 
+            // checkHotkeysFrostFreeDeathstrikePercent
+            // 
+            this.checkHotkeysFrostFreeDeathstrikePercent.AutoSize = true;
+            this.checkHotkeysFrostFreeDeathstrikePercent.Location = new System.Drawing.Point(300, 94);
+            this.checkHotkeysFrostFreeDeathstrikePercent.Name = "checkHotkeysFrostFreeDeathstrikePercent";
+            this.checkHotkeysFrostFreeDeathstrikePercent.Size = new System.Drawing.Size(20, 28);
+            this.checkHotkeysFrostFreeDeathstrikePercent.TabIndex = 9;
+            this.checkHotkeysFrostFreeDeathstrikePercent.Text = "50";
+            // 
+            // checkHotkeysFrostFreeDeathstrikeLabel
+            // 
+            this.checkHotkeysFrostFreeDeathstrikePercentLabel.AutoSize = true;
+            this.checkHotkeysFrostFreeDeathstrikePercentLabel.Location = new System.Drawing.Point(321, 96);
+            this.checkHotkeysFrostFreeDeathstrikePercentLabel.Name = "checkHotkeysFrostFreeDeathstrikePercentLabel";
+            this.checkHotkeysFrostFreeDeathstrikePercentLabel.Size = new System.Drawing.Size(20, 28);
+            this.checkHotkeysFrostFreeDeathstrikePercentLabel.TabIndex = 9;
+            this.checkHotkeysFrostFreeDeathstrikePercentLabel.Text = "% HP";
+			
+            // 
+            // checkHotkeysFrostKick
+            // 
+            this.checkHotkeysFrostKick.AutoSize = true;
+            this.checkHotkeysFrostKick.Location = new System.Drawing.Point(151, 116);
+            this.checkHotkeysFrostKick.Name = "checkHotkeysFrostKick";
+            this.checkHotkeysFrostKick.Size = new System.Drawing.Size(100, 28);
+            this.checkHotkeysFrostKick.TabIndex = 9;
+            this.checkHotkeysFrostKick.Text = "Mind Freeze";
+            this.checkHotkeysFrostKick.UseVisualStyleBackColor = true;
+            // 
+            // checkHotkeysFrostKickPercent
+            // 
+            this.checkHotkeysFrostKickPercent.AutoSize = true;
+            this.checkHotkeysFrostKickPercent.Location = new System.Drawing.Point(300, 116);
+            this.checkHotkeysFrostKickPercent.Name = "checkHotkeysFrostKickPercent";
+            this.checkHotkeysFrostKickPercent.Size = new System.Drawing.Size(20, 28);
+            this.checkHotkeysFrostKickPercent.TabIndex = 9;
+            this.checkHotkeysFrostKickPercent.Text = "50";
+            // 
+            // checkHotkeysFrostKickLabel
+            // 
+            this.checkHotkeysFrostKickPercentLabel.AutoSize = true;
+            this.checkHotkeysFrostKickPercentLabel.Location = new System.Drawing.Point(321, 118);
+            this.checkHotkeysFrostKickPercentLabel.Name = "checkHotkeysFrostKickPercentLabel";
+            this.checkHotkeysFrostKickPercentLabel.Size = new System.Drawing.Size(20, 28);
+            this.checkHotkeysFrostKickPercentLabel.TabIndex = 9;
+            this.checkHotkeysFrostKickPercentLabel.Text = "% of Cast";
             // 
             // groupBox13
             // 
@@ -860,9 +998,10 @@ namespace CloudMagic.Rotation
             this.groupBox13.Controls.Add(this.checkHotkeysFrostOffensivePillarofFrost);
             this.groupBox13.Controls.Add(this.btnHotkeysFrostOffensiveCooldowns);
             this.groupBox13.Controls.Add(this.checkHotkeyslegyring);
+            this.groupBox13.Controls.Add(this.checkHotkeysRacials);
             this.groupBox13.Location = new System.Drawing.Point(8, 8);
             this.groupBox13.Name = "groupBox13";
-            this.groupBox13.Size = new System.Drawing.Size(556, 90);
+            this.groupBox13.Size = new System.Drawing.Size(561, 90);
             this.groupBox13.TabIndex = 3;
             this.groupBox13.TabStop = false;
             this.groupBox13.Text = "Offensive Cooldowns";
@@ -875,7 +1014,7 @@ namespace CloudMagic.Rotation
             this.checkHotkeysFrostOffensiveErW.Name = "checkHotkeysFrostOffensiveErW";
             this.checkHotkeysFrostOffensiveErW.Size = new System.Drawing.Size(48, 17);
             this.checkHotkeysFrostOffensiveErW.TabIndex = 3;
-            this.checkHotkeysFrostOffensiveErW.Text = "ErW";
+            this.checkHotkeysFrostOffensiveErW.Text = "ErW / HrW";
             this.checkHotkeysFrostOffensiveErW.UseVisualStyleBackColor = true;
 
             // 
@@ -899,6 +1038,17 @@ namespace CloudMagic.Rotation
             this.checkHotkeyslegyring.TabIndex = 4;
             this.checkHotkeyslegyring.Text = "Legendary Ring";
             this.checkHotkeyslegyring.UseVisualStyleBackColor = true;
+			
+			// 
+            // checkHotkeysRacials
+            // 
+            this.checkHotkeysRacials.AutoSize = true;
+            this.checkHotkeysRacials.Location = new System.Drawing.Point(300, 60);
+            this.checkHotkeysRacials.Name = "checkHotkeysRacials";
+            this.checkHotkeysRacials.Size = new System.Drawing.Size(99, 17);
+            this.checkHotkeysRacials.TabIndex = 5;
+            this.checkHotkeysRacials.Text = "Use Racials";
+            this.checkHotkeysRacials.UseVisualStyleBackColor = true;
 			
             // 
             // btnHotkeysFrostOffensiveCooldowns
@@ -945,7 +1095,7 @@ namespace CloudMagic.Rotation
 
 /*
 [AddonDetails.db]
-AddonAuthor=FmFlex
+AddonAuthor=smartie
 AddonName=smartie
 WoWVersion=Legion - 70100
 [SpellBook.db]
@@ -959,14 +1109,16 @@ Spell,49998,Death Strike,NumPad1
 Spell,48707,Anti-Magic Shell,NumPad2
 Spell,48792,Icebound Fortitude,NumPad3
 Spell,51271,PillarofFrost,D6
-Spell,45524,ChainofIce,NumPad5
 Spell,47568,Empower Rune,D9
 Spell,207127,HEmpower Rune,D9
 Spell,207256,Obliteration,OemOpenBrackets
-Spell,47528,Mind Freeze,NumPad4
 Spell,152279,Breath,D5
 Spell,57330,Horn,D0
 Spell,190778,Sindragosa's Fury,D8
+Spell,26297,Berserking,F9
+Spell,80483,Arcane Torrent,F9
+Spell,20572,Blood Fury,F9
+Spell,47528,Mind Freeze,NumPad4
 Aura,51124,Killing Machine
 Aura,194879,Icy Talons
 Aura,55095,Frost Fever

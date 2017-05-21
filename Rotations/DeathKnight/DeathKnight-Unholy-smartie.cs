@@ -1,6 +1,8 @@
 //Changelog
 // v1.0 First release
 // v1.1 alot of Bugfixes
+// v1.2 massive cleanup
+// v1.3 Soul Reaper is now supported and working
 
 
 using System;
@@ -204,7 +206,7 @@ namespace CloudMagic.Rotation
 
         public override void Initialize()
         {
-            Log.Write("Welcome to the Unholy DK v1.1 by smartie", Color.Green);
+            Log.Write("Welcome to the Unholy DK v1.3 by smartie", Color.Green);
 	        Log.Write("All Talents supported and auto detected", Color.Green);		
             SettingsFormDFF = new SettingsFormDFF();
             SettingsForm = SettingsFormDFF;
@@ -342,22 +344,22 @@ namespace CloudMagic.Rotation
                     coolDownStopWatch.Restart();
                 }
             }
-			if (!WoW.IsInCombat && !WoW.HasPet && WoW.CanCast("Raise Dead") && !WoW.IsMounted)
+			if (!WoW.IsInCombat && !WoW.HasPet && WoW.CanCast("Raise Dead") && !WoW.PlayerHasDebuff("Ignoble Sacrifice") && !WoW.IsMounted)
             {
 				WoW.CastSpell("Raise Dead") ;
 				return;
 			}
             if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.TargetIsVisible && !WoW.IsMounted)
             {
-                if (!WoW.IsSpellOnCooldown("Anti-Magic Shell") && WoW.HealthPercent <= UnholyAMSHPPercent && !WoW.IsSpellOnCooldown("Anti-Magic Shell") && isCheckHotkeysUnholyIceboundFortitude && WoW.Level >= 57)
+                if (!WoW.IsSpellOnCooldown("Anti-Magic Shell") && WoW.HealthPercent <= UnholyAMSHPPercent &&isCheckHotkeysUnholyAntiMagicShield && WoW.Level >= 57)
                 {
                     WoW.CastSpell("Anti-Magic Shell");
                 }
-                if (!WoW.IsSpellOnCooldown("Icebound Fortitude") && WoW.HealthPercent < UnholyIceboundHPPercent && !WoW.IsSpellOnCooldown("Icebound Fortitude") && isCheckHotkeysUnholyAntiMagicShield && WoW.Level >= 65)
+                if (!WoW.IsSpellOnCooldown("Icebound Fortitude") && WoW.HealthPercent <= UnholyIceboundHPPercent  && isCheckHotkeysUnholyIceboundFortitude && WoW.Level >= 65)
                 {
                     WoW.CastSpell("Icebound Fortitude");
                 }
-				if (!WoW.HasPet && WoW.CanCast("Raise Dead"))
+				if (!WoW.HasPet && WoW.CanCast("Raise Dead") && !WoW.PlayerHasDebuff("Ignoble Sacrifice"))
 				{
 					WoW.CastSpell("Raise Dead") ;
 					return;
@@ -367,410 +369,1102 @@ namespace CloudMagic.Rotation
 				{
 					if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.TargetIsVisible && !WoW.IsMounted)
 					{
-						//Cooldowns
-						if (combatRoutine.UseCooldowns && !WoW.ItemOnCooldown("KBW") && isCheckHotkeyslegytrinket)
-						{
-							WoW.CastSpell("KBW") ;
-							return;
+						//Dark Arbiter Rotation
+                		if (WoW.Talent(7) == 1)
+                		{
+							//Cooldowns with Legendary Shoulders
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Dark Arbiter") && isCheckHotkeyslegyshoulder && WoW.RunicPower <=70 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 200)
+							{
+								WoW.CastSpell("Dark Arbiter") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 16500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 5500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 3500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							//Cooldowns without Legendary Shoulders
+							if (combatRoutine.UseCooldowns && !WoW.ItemOnCooldown("KBW") && isCheckHotkeyslegytrinket)
+							{
+								WoW.CastSpell("KBW") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Dark Arbiter") && !isCheckHotkeyslegyshoulder && WoW.TargetDebuffStacks("Festering Wound") >=6 && WoW.RunicPower >=70)
+							{
+								WoW.CastSpell("Dark Arbiter") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Apocalypse") && WoW.TargetDebuffStacks("Festering Wound") >=6)
+							{
+								WoW.CastSpell("Apocalypse") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.PlayerRace == "BloodElf" && WoW.CanCast("Arcane Torrent") && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >=10500 && WoW.Talent(7) == 1 && WoW.RunicPower <35)
+							{
+								WoW.CastSpell("Arcane Torrent");
+								return;
+							}
+							//Single Target Rotation
+							if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && (!WoW.TargetHasDebuff("Virulent Plague") || WoW.TargetDebuffTimeRemaining("Virulent Plague") <= 200))
+							{
+								WoW.CastSpell("Outbreak") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower >=90 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower >=35 && WoW.RunicPower != 119 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 500 && WoW.PlayerHasBuff("Sudden Doom") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower != 119 && WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes >= 3 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >=10500 && WoW.RunicPower >=35)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.RunicPower <=35 && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 600 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.RunicPower <=87 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 3 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <= 200 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >=10500 && WoW.RunicPower <=35 && !WoW.CanCast("Arcane Torrent") && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(3) == 3 && WoW.CurrentRunes >= 1)
+                        	{
+                           		WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(7) == 1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(7) == 1 && WoW.Talent(3) == 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(3) != 3 && WoW.CurrentRunes >= 1)
+                        	{
+                           		WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(7) == 1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(7) == 1 && WoW.Talent(3) != 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Blighted Rune Weapon") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 3 && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Blighted Rune Weapon") ;
+								return;
+							}
 						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.Talent(7) != 1)
-						{
-							WoW.CastSpell("Summon Gargoyle") ;
-							return;
+						//Soul Reaper Rotation
+                		if (WoW.Talent(7) == 3)
+                		{
+							//Cooldowns with Legendary Shoulders
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 1000 && WoW.Talent(7) != 1)
+							{
+								WoW.CastSpell("Summon Gargoyle") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) != 1 && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 5500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) != 1 && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 3500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							//Cooldowns without Legendary Shoulders
+							if (combatRoutine.UseCooldowns && !WoW.ItemOnCooldown("KBW") && isCheckHotkeyslegytrinket)
+							{
+								WoW.CastSpell("KBW") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.Talent(7) != 1)
+							{
+								WoW.CastSpell("Summon Gargoyle") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Soul Reaper") && WoW.TargetDebuffStacks("Festering Wound") >=6 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 400 && WoW.CurrentRunes >= 4)
+							{
+								WoW.CastSpell("Soul Reaper") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Apocalypse") && WoW.TargetDebuffStacks("Festering Wound") >=6)
+							{
+								WoW.CastSpell("Apocalypse") ;
+								return;
+							}
+							//Single Target Rotation
+							if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && (!WoW.TargetHasDebuff("Virulent Plague") || WoW.TargetDebuffTimeRemaining("Virulent Plague") <= 200))
+							{
+								WoW.CastSpell("Outbreak") ;
+								return;
+							}
+							if (!combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && WoW.CanCast("Soul Reaper") && WoW.TargetDebuffStacks("Festering Wound") >=3 && WoW.CurrentRunes >= 4)
+							{
+								WoW.CastSpell("Soul Reaper") ;
+								return;
+							}
+							if (WoW.TargetHasDebuff("Soul Reaper2"))
+							{
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+							}
+							if (WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 1 && WoW.SpellCooldownTimeRemaining("Soul Reaper") <= 500)
+							{
+								if (WoW.CanCast("Festering Strike"))
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+							}
+							if (!WoW.TargetHasDebuff("Soul Reaper2") && WoW.SpellCooldownTimeRemaining("Soul Reaper") >= 500)
+							{
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower >=90 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Necrosis") && WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 1 && WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 3 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 1 && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 1 && WoW.Talent(7) != 1 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.RunicPower <=35 && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 600 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2)
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.RunicPower <=87 && WoW.CurrentRunes >= 2)
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.CurrentRunes >= 2)
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Blighted Rune Weapon") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 3 && WoW.CurrentRunes >= 3)
+								{
+									WoW.CastSpell("Blighted Rune Weapon") ;
+									return;
+								}
+							}
+							if (!WoW.TargetHasDebuff("Soul Reaper2") && WoW.SpellCooldownTimeRemaining("Soul Reaper") <= 500)
+							{		
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower >=90 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Necrosis") && WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 1 && WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 3 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 1 && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 1 && WoW.Talent(7) != 1 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+							}
 						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 1000 && WoW.Talent(7) != 1)
-						{
-							WoW.CastSpell("Summon Gargoyle") ;
-							return;
+						//Defile Rotation
+                		if (WoW.Talent(7) == 2)
+                		{
+							//Cooldowns with Legendary Shoulders
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 1000)
+							{
+								WoW.CastSpell("Summon Gargoyle") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 5500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 3500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							//Cooldowns without Legendary Shoulders
+							if (combatRoutine.UseCooldowns && !WoW.ItemOnCooldown("KBW") && isCheckHotkeyslegytrinket)
+							{
+								WoW.CastSpell("KBW") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Summon Gargoyle") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Apocalypse") && WoW.TargetDebuffStacks("Festering Wound") >=6)
+							{
+								WoW.CastSpell("Apocalypse") ;
+								return;
+							}
+							//Single Target Rotation
+							if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && (!WoW.TargetHasDebuff("Virulent Plague") || WoW.TargetDebuffTimeRemaining("Virulent Plague") <= 200))
+							{
+								WoW.CastSpell("Outbreak") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.RunicPower >=90 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && !WoW.PlayerHasBuff("Necrosis") && WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 1 && WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 3 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}					
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) == 1 && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) != 1 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) != 3 && WoW.RunicPower <=35 && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) != 3 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 600 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) != 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.RunicPower <=87 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) == 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.CurrentRunes >= 1)
+							{
+                           		WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}				
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.CurrentRunes >= 1)
+                        	{
+                            	WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}										
+							if (WoW.CanCast("Defile") && WoW.TargetHasDebuff("Virulent Plague") && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Defile") ;
+								return;
+							}
+							if (WoW.CanCast("Defile") && WoW.TargetHasDebuff("Virulent Plague") && WoW.CurrentRunes <= 1 && (WoW.RunicPower >=35 || WoW.PlayerHasBuff("Sudden Doom")))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Blighted Rune Weapon") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 3 && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Blighted Rune Weapon") ;
+								return;
+							}
 						}
-						if (combatRoutine.UseCooldowns && WoW.CanCast("Dark Arbiter") && !isCheckHotkeyslegyshoulder && WoW.RunicPower <=70 && WoW.Talent(7) == 1)
-						{
-							WoW.CastSpell("Dark Arbiter") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.CanCast("Dark Arbiter") && isCheckHotkeyslegyshoulder && WoW.RunicPower <=70 && WoW.Talent(7) == 1 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 200)
-						{
-							WoW.CastSpell("Dark Arbiter") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.CurrentRunes >= 3)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 16500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 5500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 3500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 5500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 3500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.CanCast("Soul Reaper") && WoW.Talent(7) == 3 && WoW.TargetDebuffStacks("Festering Wound") >=6 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 400 && WoW.CurrentRunes >= 1)
-						{
-							WoW.CastSpell("Soul Reaper") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.CanCast("Apocalypse") && WoW.TargetDebuffStacks("Festering Wound") >=6)
-						{
-							WoW.CastSpell("Apocalypse") ;
-							return;
-						}
-						//Single Target Rotation
-						if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && (!WoW.TargetHasDebuff("Virulent Plague") || WoW.TargetDebuffTimeRemaining("Virulent Plague") <= 200))
-						{
-							WoW.CastSpell("Outbreak") ;
-							return;
-						}
-						if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && WoW.RunicPower == 119)
-						{
-							WoW.CastSpell("Outbreak") ;
-							return;
-						}
-						if (!combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && WoW.CanCast("Soul Reaper") &&  WoW.Talent(7) == 3 && WoW.TargetDebuffStacks("Festering Wound") >=3 && WoW.CurrentRunes >= 1)
-						{
-							WoW.CastSpell("Soul Reaper") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower >=90 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Necrosis") && WoW.PlayerHasBuff("Sudden Doom") && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 1 && WoW.PlayerHasBuff("Sudden Doom") && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) == 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 500 && WoW.PlayerHasBuff("Sudden Doom") && WoW.CurrentRunes >= 3)
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes >= 3 && WoW.RunicPower >=35 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}					
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 1 && WoW.Talent(7) == 1 && WoW.LastSpell == ("Dark Arbiter") && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35)
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 1 && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 1 && WoW.Talent(7) != 1 && WoW.RunicPower >=35 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 1 && WoW.Talent(7) == 1 && WoW.RunicPower >=35 && WoW.LastSpell == ("Dark Arbiter"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower <=35 && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Sudden Doom") && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Festering Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 600 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Festering Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.RunicPower <=87 && WoW.CurrentRunes >= 2 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Festering Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.TargetHasDebuff("Soul Reaper") && WoW.CurrentRunes >= 1)
-						{
-							WoW.CastSpell("Scourge Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(3) != 3 && WoW.Talent(6) == 2 && WoW.PlayerHasBuff("Necrosis") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.RunicPower <=85 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Scourge Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=85 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Scourge Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.RunicPower <=85 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Scourge Strike") ;
-							return;
-						}
-						if(WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1  && WoW.Talent(3) == 3 && WoW.TargetHasDebuff("Soul Reaper") && WoW.CurrentRunes >= 1)
-                        {
-                            WoW.CastSpell("Clawing Shadows") ;
-							return;
-						}
-						if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Clawing Shadows") ;
-							return;
-						}
-						if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Clawing Shadows") ;
-							return;
-						}
-						if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Clawing Shadows") ;
-							return;
-						}
-						if (WoW.CanCast("Defile") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) == 2)
-						{
-							WoW.CastSpell("Defile") ;
-							return;
-						}
-						if (WoW.CanCast("Blighted Rune Weapon") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 3 && WoW.CurrentRunes >= 3)
-						{
-							WoW.CastSpell("Blighted Rune Weapon") ;
-							return;
-						}
-						//if (WoW.CanCast("Epidemic") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 1 && WoW.TargetDebuffStacks("Festering Wound") >=6 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						//{
-						//	WoW.CastSpell("Epidemic") ;
-						//	return;
-						//}
 					}
 				}
 				if (combatRoutine.Type == RotationType.AOE) // AoE Rotation
 				{
 					if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat && WoW.TargetIsVisible && !WoW.IsMounted)
 					{
-						//Cooldowns
-						if (combatRoutine.UseCooldowns && !WoW.ItemOnCooldown("KBW") && isCheckHotkeyslegytrinket)
-						{
-							WoW.CastSpell("KBW") ;
-							return;
+						//Dark Arbiter Rotation
+                		if (WoW.Talent(7) == 1)
+                		{
+							//Cooldowns with Legendary Shoulders
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Dark Arbiter") && isCheckHotkeyslegyshoulder && WoW.RunicPower <=70 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 200)
+							{
+								WoW.CastSpell("Dark Arbiter") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 16500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 5500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 3500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							//Cooldowns without Legendary Shoulders
+							if (combatRoutine.UseCooldowns && !WoW.ItemOnCooldown("KBW") && isCheckHotkeyslegytrinket)
+							{
+								WoW.CastSpell("KBW") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Dark Arbiter") && !isCheckHotkeyslegyshoulder && WoW.TargetDebuffStacks("Festering Wound") >=6 && WoW.RunicPower >=70)
+							{
+								WoW.CastSpell("Dark Arbiter") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Apocalypse") && WoW.TargetDebuffStacks("Festering Wound") >=6)
+							{
+								WoW.CastSpell("Apocalypse") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.PlayerRace == "BloodElf" && WoW.CanCast("Arcane Torrent") && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >=10500 && WoW.Talent(7) == 1 && WoW.RunicPower <35)
+							{
+								WoW.CastSpell("Arcane Torrent");
+								return;
+							}
+							//Multi Target Rotation
+							if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && (!WoW.TargetHasDebuff("Virulent Plague") || WoW.TargetDebuffTimeRemaining("Virulent Plague") <= 200))
+							{
+								WoW.CastSpell("Outbreak") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.RunicPower >=90 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.RunicPower >=35 && WoW.RunicPower != 119 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 500 && WoW.PlayerHasBuff("Sudden Doom") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.RunicPower != 119 && WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes >= 3 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >=10500 && WoW.RunicPower >=35)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(6) != 3 && WoW.RunicPower <=35 && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(6) != 3 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 600 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(6) != 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.RunicPower <=87 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(6) == 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Festering Strike") && !WoW.CanCast("Death and Decay") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 3 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <= 200 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >=10500 && WoW.RunicPower <=35 && !WoW.CanCast("Arcane Torrent") && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(3) == 3 && WoW.CurrentRunes >= 1)
+                        	{
+                           		WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(7) == 1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(7) == 1 && WoW.Talent(3) == 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(3) != 3 && WoW.CurrentRunes >= 1)
+                        	{
+                           		WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(7) == 1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") <=10500 && WoW.Talent(7) == 1 && WoW.Talent(3) != 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Blighted Rune Weapon") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) == 3 && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Blighted Rune Weapon") ;
+								return;
+							}
+							if (WoW.CanCast("Epidemic") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) == 1 && WoW.TargetDebuffStacks("Festering Wound") >=3 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Epidemic") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 1 && WoW.CanCast("Epidemic") && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(3) != 3 && !WoW.CanCast("Epidemic") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) == 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(3) == 3 && !WoW.CanCast("Epidemic") && !WoW.CanCast("Death and Decay") && WoW.Talent(2) == 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Death and Decay") && WoW.TargetHasDebuff("Virulent Plague") && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Death and Decay") ;
+								return;
+							}
+							if (WoW.CanCast("Death and Decay") && WoW.TargetHasDebuff("Virulent Plague") && WoW.CurrentRunes <= 1 && (WoW.RunicPower >=35 || WoW.PlayerHasBuff("Sudden Doom")))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
 						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.Talent(7) != 1)
-						{
-							WoW.CastSpell("Summon Gargoyle") ;
-							return;
+						//Soul Reaper Rotation
+                		if (WoW.Talent(7) == 3)
+                		{
+							//Cooldowns with Legendary Shoulders
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 1000 && WoW.Talent(7) != 1)
+							{
+								WoW.CastSpell("Summon Gargoyle") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) != 1 && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 5500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) != 1 && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 3500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							//Cooldowns without Legendary Shoulders
+							if (combatRoutine.UseCooldowns && !WoW.ItemOnCooldown("KBW") && isCheckHotkeyslegytrinket)
+							{
+								WoW.CastSpell("KBW") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.Talent(7) != 1)
+							{
+								WoW.CastSpell("Summon Gargoyle") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Soul Reaper") && WoW.TargetDebuffStacks("Festering Wound") >=6 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 400 && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Soul Reaper") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Apocalypse") && WoW.TargetDebuffStacks("Festering Wound") >=6)
+							{
+								WoW.CastSpell("Apocalypse") ;
+								return;
+							}
+							//Multi Target Rotation
+							if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && (!WoW.TargetHasDebuff("Virulent Plague") || WoW.TargetDebuffTimeRemaining("Virulent Plague") <= 200))
+							{
+								WoW.CastSpell("Outbreak") ;
+								return;
+							}
+							if (!combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && WoW.CanCast("Soul Reaper") && WoW.TargetDebuffStacks("Festering Wound") >=3 && WoW.CurrentRunes >= 4)
+							{
+								WoW.CastSpell("Soul Reaper") ;
+								return;
+							}
+							if (WoW.TargetHasDebuff("Soul Reaper2"))
+							{
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+							}
+							if (WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 1 && WoW.SpellCooldownTimeRemaining("Soul Reaper") <= 500)
+							{
+								if (WoW.CanCast("Festering Strike"))
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+							}
+							if (!WoW.TargetHasDebuff("Soul Reaper2") && WoW.SpellCooldownTimeRemaining("Soul Reaper") >= 500)
+							{
+								if (WoW.CanCast("Death and Decay") && WoW.TargetHasDebuff("Virulent Plague") && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Death and Decay") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower >=90 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Necrosis") && WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 1 && WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 3 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 1 && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 1 && WoW.Talent(7) != 1 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.RunicPower <=35 && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 600 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2)
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.RunicPower <=87 && WoW.CurrentRunes >= 2)
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.CurrentRunes >= 2)
+								{
+									WoW.CastSpell("Festering Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Clawing Shadows") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.CurrentRunes >= 1)
+								{
+									WoW.CastSpell("Scourge Strike") ;
+									return;
+								}
+								if (WoW.CanCast("Blighted Rune Weapon") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 3 && WoW.CurrentRunes >= 3)
+								{
+									WoW.CastSpell("Blighted Rune Weapon") ;
+									return;
+								}
+							}
+							if (!WoW.TargetHasDebuff("Soul Reaper2") && WoW.SpellCooldownTimeRemaining("Soul Reaper") <= 500)
+							{		
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower >=90 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Necrosis") && WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 1 && WoW.PlayerHasBuff("Sudden Doom"))
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 3 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 1 && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+								if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 1 && WoW.Talent(7) != 1 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+								{
+									WoW.CastSpell("Death Coil") ;
+									return;
+								}
+							}
 						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 1000 && WoW.Talent(7) != 1)
-						{
-							WoW.CastSpell("Summon Gargoyle") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.CanCast("Dark Arbiter") && !isCheckHotkeyslegyshoulder && WoW.RunicPower <=70 && WoW.Talent(7) == 1)
-						{
-							WoW.CastSpell("Dark Arbiter") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.CanCast("Dark Arbiter") && isCheckHotkeyslegyshoulder && WoW.RunicPower <=70 && WoW.Talent(7) == 1 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 200)
-						{
-							WoW.CastSpell("Dark Arbiter") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.CurrentRunes >= 3)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 16500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 5500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 3500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 5500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(7) == 1 && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 3500)
-						{
-							WoW.CastSpell("Dark Transformation") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.CanCast("Soul Reaper") && WoW.Talent(7) == 3 && WoW.TargetDebuffStacks("Festering Wound") >=6 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 400 && WoW.CurrentRunes >= 1)
-						{
-							WoW.CastSpell("Soul Reaper") ;
-							return;
-						}
-						if (combatRoutine.UseCooldowns && WoW.CanCast("Apocalypse") && WoW.TargetDebuffStacks("Festering Wound") >=6)
-						{
-							WoW.CastSpell("Apocalypse") ;
-							return;
-						}
-						//Multi Target Rotation
-						if (WoW.TargetHasDebuff("Virulent Plague") && WoW.CurrentRunes >= 1 && WoW.CanCast("Death and Decay") && WoW.Talent(7) != 2)
-						{
-							WoW.CastSpell("Death and Decay") ;
-							return;
-						}
-						if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && (!WoW.TargetHasDebuff("Virulent Plague") || WoW.TargetDebuffTimeRemaining("Virulent Plague") <= 200))
-						{
-							WoW.CastSpell("Outbreak") ;
-							return;
-						}
-						if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && WoW.RunicPower == 119)
-						{
-							WoW.CastSpell("Outbreak") ;
-							return;
-						}
-						if (!combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && WoW.CanCast("Soul Reaper") &&  WoW.Talent(7) == 3 && WoW.TargetDebuffStacks("Festering Wound") >=3 && WoW.CurrentRunes >= 1)
-						{
-							WoW.CastSpell("Soul Reaper") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower >=90 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Necrosis") && WoW.PlayerHasBuff("Sudden Doom") && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) != 1 && WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 1 && WoW.PlayerHasBuff("Sudden Doom") && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) == 1 && WoW.SpellCooldownTimeRemaining("Dark Arbiter") >= 500 && WoW.PlayerHasBuff("Sudden Doom") && WoW.CurrentRunes >= 3)
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes >= 3 && WoW.RunicPower >=35 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}					
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 1 && WoW.Talent(7) == 1 && WoW.LastSpell == ("Dark Arbiter") && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35)
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) == 1 && WoW.Talent(7) != 1 && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 1 && WoW.Talent(7) != 1 && WoW.RunicPower >=35 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(6) != 1 && WoW.Talent(7) == 1 && WoW.RunicPower >=35 && WoW.LastSpell == ("Dark Arbiter"))
-						{
-							WoW.CastSpell("Death Coil") ;
-							return;
-						}
-						if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.RunicPower <=35 && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Sudden Doom") && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Festering Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 600 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Festering Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.RunicPower <=87 && WoW.CurrentRunes >= 2 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Festering Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.TargetHasDebuff("Soul Reaper") && WoW.CurrentRunes >= 1)
-						{
-							WoW.CastSpell("Scourge Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) != 1 && WoW.Talent(3) != 3 && WoW.Talent(6) == 2 && WoW.PlayerHasBuff("Necrosis") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.RunicPower <=85 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Scourge Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(2) != 1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=85 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Scourge Strike") ;
-							return;
-						}
-						if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(2) != 1 && WoW.Talent(3) != 3 && WoW.RunicPower <=85 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Scourge Strike") ;
-							return;
-						}
-						if(WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1  && WoW.Talent(3) == 3 && WoW.TargetHasDebuff("Soul Reaper") && WoW.CurrentRunes >= 1)
-                        {
-                            WoW.CastSpell("Clawing Shadows") ;
-							return;
-						}
-						if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(2) != 1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Clawing Shadows") ;
-							return;
-						}
-						if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(2) != 1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Clawing Shadows") ;
-							return;
-						}
-						if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(2) != 1 && WoW.Talent(3) == 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Clawing Shadows") ;
-							return;
-						}
-						if (WoW.CanCast("Defile") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(7) == 2)
-						{
-							WoW.CastSpell("Defile") ;
-							return;
-						}
-						if (WoW.CanCast("Blighted Rune Weapon") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 3 && WoW.CurrentRunes >= 3)
-						{
-							WoW.CastSpell("Blighted Rune Weapon") ;
-							return;
-						}
-						if (WoW.CanCast("Epidemic") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 1 && WoW.TargetDebuffStacks("Festering Wound") >=6 && WoW.CurrentRunes >= 1 && !WoW.TargetHasDebuff("Soul Reaper"))
-						{
-							WoW.CastSpell("Epidemic") ;
-							return;
+						//Defile Rotation
+                		if (WoW.Talent(7) == 2)
+                		{
+							//Cooldowns with Legendary Shoulders
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3 && WoW.SpellCooldownTimeRemaining("Dark Transformation") >= 1000)
+							{
+								WoW.CastSpell("Summon Gargoyle") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(6) != 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 5500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.Talent(6) == 1 && WoW.SpellCooldownTimeRemaining("Summon Gargoyle") >= 3500)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							//Cooldowns without Legendary Shoulders
+							if (combatRoutine.UseCooldowns && !WoW.ItemOnCooldown("KBW") && isCheckHotkeyslegytrinket)
+							{
+								WoW.CastSpell("KBW") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && isCheckHotkeysUnholyOffensiveSummonGargoyle && WoW.CanCast("Summon Gargoyle") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Summon Gargoyle") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.TargetHasDebuff("Virulent Plague") && !isCheckHotkeyslegyshoulder && WoW.CanCast("Dark Transformation") && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Dark Transformation") ;
+								return;
+							}
+							if (combatRoutine.UseCooldowns && WoW.CanCast("Apocalypse") && WoW.TargetDebuffStacks("Festering Wound") >=6)
+							{
+								WoW.CastSpell("Apocalypse") ;
+								return;
+							}
+							//Multi Target Rotation
+							if (WoW.CurrentRunes >= 1 && WoW.CanCast("Outbreak") && (!WoW.TargetHasDebuff("Virulent Plague") || WoW.TargetDebuffTimeRemaining("Virulent Plague") <= 200))
+							{
+								WoW.CastSpell("Outbreak") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.RunicPower >=90 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && !WoW.PlayerHasBuff("Necrosis") && WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 1 && WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) == 2 && !WoW.PlayerHasBuff("Necrosis") && WoW.CurrentRunes <= 3 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}					
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) == 1 && !WoW.PlayerHasBuff("Dark Transformation") && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Death Coil") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) != 1 && WoW.RunicPower >=35 && WoW.RunicPower != 119)
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) != 3 && WoW.RunicPower <=35 && WoW.CurrentRunes >= 2 && !WoW.PlayerHasBuff("Sudden Doom"))
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) != 3 && WoW.SpellCooldownTimeRemaining("Apocalypse") >= 600 && WoW.TargetDebuffStacks("Festering Wound") <=6 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) != 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.RunicPower <=87 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(6) == 3 && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.CurrentRunes >= 1)
+							{
+                           		WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) != 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}				
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.CurrentRunes >= 1)
+                        	{
+                            	WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Necrosis") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.PlayerHasBuff("Unholy Strength") && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) != 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.Talent(3) == 3 && WoW.RunicPower <=89 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}										
+							if (WoW.CanCast("Defile") && WoW.TargetHasDebuff("Virulent Plague") && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Defile") ;
+								return;
+							}
+							if (WoW.CanCast("Defile") && WoW.TargetHasDebuff("Virulent Plague") && WoW.CurrentRunes <= 1 && (WoW.RunicPower >=35 || WoW.PlayerHasBuff("Sudden Doom")))
+							{
+								WoW.CastSpell("Death Coil") ;
+								return;
+							}
+							if (WoW.CanCast("Blighted Rune Weapon") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 3 && WoW.CurrentRunes >= 3)
+							{
+								WoW.CastSpell("Blighted Rune Weapon") ;
+								return;
+							}
+							if (WoW.CanCast("Epidemic") && WoW.TargetHasDebuff("Virulent Plague") && !WoW.CanCast("Defile") && WoW.Talent(2) == 1 && WoW.TargetDebuffStacks("Festering Wound") >=3 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Epidemic") ;
+								return;
+							}
+							if (WoW.CanCast("Festering Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(2) == 1 && WoW.CanCast("Epidemic") && WoW.TargetDebuffStacks("Festering Wound") <=3 && WoW.CurrentRunes >= 2)
+							{
+								WoW.CastSpell("Festering Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Scourge Strike") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(3) != 3 && !WoW.CanCast("Epidemic") && !WoW.CanCast("Defile") && WoW.Talent(2) == 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Scourge Strike") ;
+								return;
+							}
+							if (WoW.CanCast("Clawing Shadows") && WoW.TargetHasDebuff("Virulent Plague") && WoW.Talent(3) == 3 && !WoW.CanCast("Epidemic") && !WoW.CanCast("Defile") && WoW.Talent(2) == 1 && WoW.TargetDebuffStacks("Festering Wound") >=1 && WoW.CurrentRunes >= 1)
+							{
+								WoW.CastSpell("Clawing Shadows") ;
+								return;
+							}
 						}
 					}
 				}
@@ -1110,11 +1804,14 @@ Spell,48792,Icebound Fortitude,NumPad3
 Spell,46584,Raise Dead,NumPad5
 Spell,194918,Blighted Rune Weapon,NumPad6
 Spell,235991,KBW,T
+Spell,80483,Arcane Torrent,F3
 Aura,101568,Free DeathStrike
 Aura,191587,Virulent Plague
 Aura,194310,Festering Wound
 Aura,207305,Castigator
 Aura,215711,Soul Reaper
+Aura,130736,Soul Reaper2
+Aura,212756,Ignoble Sacrifice
 Aura,63560,Dark Transformation
 Aura,81340,Sudden Doom
 Aura,170761,Necrosis

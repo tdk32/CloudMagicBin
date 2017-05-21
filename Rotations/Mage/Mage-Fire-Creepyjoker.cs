@@ -6,7 +6,10 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 using CloudMagic.Helpers;
+using System.Threading;
 
 namespace CloudMagic.Rotation
 {
@@ -27,6 +30,7 @@ namespace CloudMagic.Rotation
         private CheckBox ROFBox;
         private CheckBox RuneOfPowerBox;
         private CheckBox SpellLockBox;
+		
 
         public static bool DragBr
         {
@@ -430,11 +434,11 @@ namespace CloudMagic.Rotation
             if (stopwatch.ElapsedMilliseconds == 0)
             {
                 stopwatch.Start();
-                Log.WriteCloudMagic("The Cooldown toggle button is now Active (Numpad0). The delay is set to 1000ms ( 1 second )", Color.Black);
+                Log.WriteCloudMagic("The Cooldown toggle button is now Active (Numpad9). The delay is set to 1000ms ( 1 second )", Color.Black);
                 return;
             }
             {
-                if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_NUMPAD0) < 0)
+                if (DetectKeyPress.GetKeyState(DetectKeyPress.VK_NUMPAD9) < 0)
                 {
                     if (stopwatch.ElapsedMilliseconds > 1000)
                     {
@@ -447,7 +451,7 @@ namespace CloudMagic.Rotation
 
                     if (WoW.HasTarget && WoW.TargetIsEnemy && WoW.IsInCombat)
                     {
-                        if (UseCooldowns && RuneOfPower && WoW.PlayerSpellCharges("Rune of Power") >= 1 && WoW.SpellCooldownTimeRemaining("Combustion") >= 40 &&
+                        if (UseCooldowns && RuneOfPower && WoW.PlayerSpellCharges("Rune of Power") >= 1 && WoW.SpellCooldownTimeRemaining("Combustion") >= 4000 &&
                             WoW.PlayerHasBuff("Hot Streak!") && !WoW.PlayerIsCasting && !WoW.IsMoving && !WoW.PlayerHasBuff("Rune of Power") && !WoW.IsSpellOnCooldown("Rune of Power") ||
                             (UseCooldowns && RuneOfPower && !WoW.PlayerIsCasting && WoW.PlayerSpellCharges("Fire Blast") == 3 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 &&
                              !WoW.IsMoving && !WoW.IsSpellOnCooldown("Combustion") && WoW.PlayerSpellCharges("Rune of Power") >= 1 && WoW.PlayerHasBuff("Hot Streak!") &&
@@ -471,7 +475,7 @@ namespace CloudMagic.Rotation
                             WoW.CastSpell("Meteor");
                             return;
                         }
-                        if (WoW.CanCast("Phoenix's Flames") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 &&
+                        if (WoW.CanCast("Phoenix's Flames") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 110 &&
                             WoW.PlayerHasBuff("Heating Up") && UseCooldowns && Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") == 3 && !WoW.IsSpellOnCooldown("Combustion"))
                         {
                             WoW.CastSpell("Phoenix's Flames");
@@ -484,7 +488,7 @@ namespace CloudMagic.Rotation
                             return;
                         }
                         if (WoW.CanCast("Phoenix's Flames") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.PlayerHasBuff("Heating Up") && WoW.LastSpell != "Fire Blast" &&
-                            WoW.LastSpell != "Phoenix's Flames" && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 && !UseCooldowns && Combustion &&
+                            WoW.LastSpell != "Phoenix's Flames" && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 110 && !UseCooldowns && Combustion &&
                             WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && !WoW.IsSpellOnCooldown("Combustion"))
                         {
                             WoW.CastSpell("Phoenix's Flames");
@@ -496,8 +500,8 @@ namespace CloudMagic.Rotation
                             WoW.CastSpell("Fire Blast");
                             return;
                         }
-                        if (WoW.CanCast("Phoenix's Flames") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 && WoW.PlayerHasBuff("Heating Up") &&
-                            Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.SpellCooldownTimeRemaining("Combustion") > 60 && !WoW.PlayerHasBuff("Hot Streak!"))
+                        if (WoW.CanCast("Phoenix's Flames") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 110 && WoW.PlayerHasBuff("Heating Up") &&
+                            Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.SpellCooldownTimeRemaining("Combustion") > 6000 && !WoW.PlayerHasBuff("Hot Streak!"))
                         {
                             WoW.CastSpell("Phoenix's Flames");
                             return;
@@ -520,14 +524,14 @@ namespace CloudMagic.Rotation
                             return;
                         }
                         if (UseCooldowns && WoW.CanCast("Cinderstorm") && Cinderstorm && WoW.TargetHasDebuff("Ignite") && !WoW.PlayerHasBuff("Combustion") &&
-                            WoW.IsSpellOnCooldown("Combustion") && WoW.SpellCooldownTimeRemaining("Combustion") > 5 && !WoW.PlayerHasBuff("Hot Streak!"))
+                            WoW.IsSpellOnCooldown("Combustion") && WoW.SpellCooldownTimeRemaining("Combustion") > 500 && !WoW.PlayerHasBuff("Hot Streak!"))
                         {
                             WoW.CastSpell("Cinderstorm");
                             return;
                         }
-                        if (UseCooldowns && Combustion && !WoW.IsSpellOnCooldown("Combustion") && WoW.PlayerHasBuff("Rune of Power") && WoW.PlayerSpellCharges("Fire Blast") == 3 &&
+                        if (UseCooldowns && Combustion && !WoW.IsSpellOnCooldown("Combustion") && WoW.PlayerHasBuff("Rune of Power") && WoW.PlayerSpellCharges("Fire Blast") >= 1 &&
                             WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling ||
-                            UseCooldowns && Combustion && Mirrors && WoW.PlayerSpellCharges("Fire Blast") == 3 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 &&
+                            UseCooldowns && Combustion && Mirrors && WoW.PlayerSpellCharges("Fire Blast") >= 1 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 &&
                             WoW.PlayerHasBuff("Hot Streak!") && !WoW.IsSpellOnCooldown("Combustion") && !WoW.IsSpellOnCooldown("Mirror Image") && !WoW.PlayerIsCasting &&
                             !WoW.PlayerIsChanneling)
                         {
@@ -540,17 +544,17 @@ namespace CloudMagic.Rotation
                             WoW.CastSpell("Dragon's Breath");
                             return;
                         }
-                        if (WoW.PlayerSpellCharges("Phoenix's Flames") > 2 && !WoW.PlayerHasBuff("Combustion") && WoW.SpellCooldownTimeRemaining("Combustion") > 20 &&
+                        if (WoW.PlayerSpellCharges("Phoenix's Flames") > 2 && !WoW.PlayerHasBuff("Combustion") && WoW.SpellCooldownTimeRemaining("Combustion") > 2000 &&
                             WoW.CanCast("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 &&
-                            WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 && WoW.LastSpell != "Phoenix's Flames" && WoW.LastSpell != "Fire Blast" ||
-                            WoW.SpellCooldownTimeRemaining("Combustion") < 20 && WoW.CanCast("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!") &&
+                            WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 110 && WoW.LastSpell != "Phoenix's Flames" && WoW.LastSpell != "Fire Blast" ||
+                            WoW.SpellCooldownTimeRemaining("Combustion") < 2000 && WoW.CanCast("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!") &&
                             WoW.PlayerSpellCharges("Phoenix's Flames") == 3 && WoW.LastSpell != "Phoenix's Flames" && WoW.LastSpell != "Fire Blast")
                         {
                             WoW.CastSpell("Phoenix's Flames");
                             return;
                         }
                         if (WoW.CanCast("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && WoW.PlayerHasBuff("Combustion") && !WoW.PlayerHasBuff("Hot Streak!") &&
-                            WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.SpellCooldownTimeRemaining("Fire Blast") > 0.5 && WoW.LastSpell != "Phoenix's Flames" &&
+                            WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.SpellCooldownTimeRemaining("Fire Blast") > 50 && WoW.LastSpell != "Phoenix's Flames" &&
                             WoW.LastSpell != "Fire Blast")
                         {
                             WoW.CastSpell("Phoenix's Flames");
@@ -570,7 +574,7 @@ namespace CloudMagic.Rotation
                         }
                         // Legendary Bracers Support.
                         if (Legendary && WoW.CanCast("Pyroblast") && !WoW.WasLastCasted("Pyroblast") && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") &&
-                            WoW.PlayerBuffTimeRemaining("Marquee Bindings of the Sun King") > 4 && WoW.PlayerHasBuff("Marquee Bindings of the Sun King") && !WoW.PlayerHasBuff("Hot Streak!") ||
+                            WoW.PlayerBuffTimeRemaining("Marquee Bindings of the Sun King") > 400 && WoW.PlayerHasBuff("Marquee Bindings of the Sun King") && !WoW.PlayerHasBuff("Hot Streak!") ||
                             (!WoW.PlayerHasBuff("Combustion") && !WoW.WasLastCasted("Pyroblast") && WoW.PlayerHasBuff("Ice Floes") && !WoW.PlayerIsCasting &&
                              WoW.PlayerHasBuff("Marquee Bindings of the Sun King") && !WoW.PlayerHasBuff("Hot Streak!")))
                         {
@@ -597,28 +601,26 @@ namespace CloudMagic.Rotation
                             WoW.CastSpell("Pyroblast");
                             return;
                         }
-
-                        if (WoW.CanCast("Fireball") && WoW.IsSpellOnCooldown("Fire Blast") && !WoW.PlayerIsCasting && WoW.IsSpellOnCooldown("Phoenix's Flames") &&
-                            WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!"))
+                        if (WoW.CanCast("Fireball") && WoW.IsSpellOnCooldown("Fire Blast") && !WoW.PlayerIsCasting && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!"))
                         {
                             WoW.CastSpell("Fireball");
                             return;
                         }
-                        if (WoW.SpellCooldownTimeRemaining("Combustion") > 20 && WoW.SpellCooldownTimeRemaining("Phoenix's Flames") > 1.3 && WoW.PlayerIsCasting &&
-                            WoW.LastSpell != "Phoenix's Flame" && WoW.LastSpell != "Fire Blast" && WoW.PlayerHasBuff("Heating Up") && WoW.PlayerSpellCharges("Fire Blast") >= 1 &&
-                            !WoW.PlayerHasBuff("Hot Streak!"))
+                        if (WoW.CanCast("Fireball") && WoW.IsSpellOnCooldown("Fire Blast") && !WoW.PlayerIsCasting && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.SpellCooldownTimeRemaining("Combustion") < 2000)
+                        {
+                            WoW.CastSpell("Fireball");
+                            return;
+                        }
+                        if (WoW.SpellCooldownTimeRemaining("Phoenix's Flames") > 130 && WoW.PlayerIsCasting && WoW.LastSpell != "Phoenix's Flame" && WoW.LastSpell != "Fire Blast" && WoW.PlayerHasBuff("Heating Up") && WoW.PlayerSpellCharges("Fire Blast") >= 1 && !WoW.PlayerHasBuff("Hot Streak!") && WoW.SpellCooldownTimeRemaining("Combustion") > 2000)
                         {
                             WoW.CastSpell("Fire Blast");
                             return;
                         }
-                        if (WoW.SpellCooldownTimeRemaining("Combustion") > 20 && WoW.LastSpell != "Phoenix's Flame" && WoW.LastSpell != "Fire Blast" && WoW.PlayerHasBuff("Heating Up") &&
-                            WoW.PlayerSpellCharges("Fire Blast") >= 1 && !WoW.PlayerHasBuff("Hot Streak!"))
+                        if (WoW.LastSpell != "Phoenix's Flame" && WoW.LastSpell != "Fire Blast" && WoW.PlayerHasBuff("Heating Up") && WoW.PlayerSpellCharges("Fire Blast") >= 1 && !WoW.PlayerHasBuff("Hot Streak!") && WoW.SpellCooldownTimeRemaining("Combustion") > 2000)
                         {
                             WoW.CastSpell("Fire Blast");
                             return;
                         }
-
-
                         if (!WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Heating Up") && WoW.CanCast("Fireball") && WoW.IsSpellInRange("Fireball") && !WoW.IsMoving && !WoW.PlayerIsChanneling &&
                             !WoW.PlayerHasBuff("Hot Streak!"))
                         {
@@ -637,15 +639,15 @@ namespace CloudMagic.Rotation
                             return;
                         }
                         if (!WoW.PlayerHasBuff("Combustion") && !WoW.IsMoving && WoW.CanCast("Fireball") && !WoW.PlayerIsCasting && WoW.PlayerHasBuff("Heating Up") &&
-                            WoW.SpellCooldownTimeRemaining("Combustion") <= 20 && WoW.PlayerSpellCharges("Fire Blast") >= 1 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 ||
+                            WoW.SpellCooldownTimeRemaining("Combustion") <= 2000 && WoW.PlayerSpellCharges("Fire Blast") >= 1 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 ||
                             WoW.CanCast("Fireball") && !WoW.IsMoving && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") && WoW.PlayerHasBuff("Heating Up") &&
-                            WoW.IsSpellOnCooldown("Fire Blast") && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 20 ||
+                            WoW.IsSpellOnCooldown("Fire Blast") && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 2000 ||
                             WoW.CanCast("Fireball") && !WoW.IsMoving && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") && WoW.PlayerHasBuff("Heating Up") &&
-                            !WoW.IsSpellOnCooldown("Fire Blast") && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 20 ||
+                            !WoW.IsSpellOnCooldown("Fire Blast") && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 2000 ||
                             WoW.CanCast("Fireball") && !WoW.IsMoving && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") && WoW.PlayerHasBuff("Heating Up") &&
-                            WoW.IsSpellOnCooldown("Fire Blast") && !WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") >= 20 ||
+                            WoW.IsSpellOnCooldown("Fire Blast") && !WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") >= 2000 ||
                             WoW.CanCast("Fireball") && !WoW.IsMoving && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") && WoW.PlayerHasBuff("Heating Up") &&
-                            WoW.IsSpellOnCooldown("Fire Blast") && !WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 20)
+                            WoW.IsSpellOnCooldown("Fire Blast") && !WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 2000)
                         {
                             WoW.CastSpell("Fireball");
                             return;
@@ -654,7 +656,7 @@ namespace CloudMagic.Rotation
             }
             if (combatRoutine.Type == RotationType.AOE)
             {
-                if (UseCooldowns && RuneOfPower && WoW.PlayerSpellCharges("Rune of Power") >= 1 && WoW.SpellCooldownTimeRemaining("Combustion") >= 40 && WoW.PlayerHasBuff("Hot Streak!") &&
+                if (UseCooldowns && RuneOfPower && WoW.PlayerSpellCharges("Rune of Power") >= 1 && WoW.SpellCooldownTimeRemaining("Combustion") >= 4000 && WoW.PlayerHasBuff("Hot Streak!") &&
                     !WoW.PlayerIsCasting && !WoW.IsMoving && !WoW.PlayerHasBuff("Rune of Power") && !WoW.IsSpellOnCooldown("Rune of Power") ||
                     (UseCooldowns && RuneOfPower && !WoW.PlayerIsCasting && WoW.PlayerSpellCharges("Fire Blast") == 3 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && !WoW.IsMoving &&
                      !WoW.IsSpellOnCooldown("Combustion") && WoW.PlayerSpellCharges("Rune of Power") >= 1 && WoW.PlayerHasBuff("Hot Streak!") && !WoW.PlayerHasBuff("Rune of Power") &&
@@ -678,7 +680,7 @@ namespace CloudMagic.Rotation
                     WoW.CastSpell("Meteor");
                     return;
                 }
-                if (WoW.CanCast("Phoenix's Flames") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 &&
+                if (WoW.CanCast("Phoenix's Flames") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 110 &&
                     WoW.PlayerHasBuff("Heating Up") && UseCooldowns && Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") == 3 && !WoW.IsSpellOnCooldown("Combustion"))
                 {
                     WoW.CastSpell("Phoenix's Flames");
@@ -691,7 +693,7 @@ namespace CloudMagic.Rotation
                     return;
                 }
                 if (WoW.CanCast("Phoenix's Flames") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.PlayerHasBuff("Heating Up") && WoW.LastSpell != "Fire Blast" &&
-                    WoW.LastSpell != "Phoenix's Flames" && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 && !UseCooldowns && Combustion &&
+                    WoW.LastSpell != "Phoenix's Flames" && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 110 && !UseCooldowns && Combustion &&
                     WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && !WoW.IsSpellOnCooldown("Combustion"))
                 {
                     WoW.CastSpell("Phoenix's Flames");
@@ -703,8 +705,8 @@ namespace CloudMagic.Rotation
                     WoW.CastSpell("Fire Blast");
                     return;
                 }
-                if (WoW.CanCast("Phoenix's Flames") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 && WoW.PlayerHasBuff("Heating Up") &&
-                    Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.SpellCooldownTimeRemaining("Combustion") > 60 && !WoW.PlayerHasBuff("Hot Streak!"))
+                if (WoW.CanCast("Phoenix's Flames") && WoW.IsSpellOnCooldown("Fire Blast") && WoW.SpellCooldownTimeRemaining("Fire Blast") > 110 && WoW.PlayerHasBuff("Heating Up") &&
+                    Combustion && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.SpellCooldownTimeRemaining("Combustion") > 6000 && !WoW.PlayerHasBuff("Hot Streak!"))
                 {
                     WoW.CastSpell("Phoenix's Flames");
                     return;
@@ -727,14 +729,14 @@ namespace CloudMagic.Rotation
                     return;
                 }
                 if (UseCooldowns && WoW.CanCast("Cinderstorm") && Cinderstorm && WoW.TargetHasDebuff("Ignite") && !WoW.PlayerHasBuff("Combustion") && WoW.IsSpellOnCooldown("Combustion") &&
-                    WoW.SpellCooldownTimeRemaining("Combustion") > 5 && !WoW.PlayerHasBuff("Hot Streak!"))
+                    WoW.SpellCooldownTimeRemaining("Combustion") > 500 && !WoW.PlayerHasBuff("Hot Streak!"))
                 {
                     WoW.CastSpell("Cinderstorm");
                     return;
                 }
-                if (UseCooldowns && Combustion && !WoW.IsSpellOnCooldown("Combustion") && WoW.PlayerHasBuff("Rune of Power") && WoW.PlayerSpellCharges("Fire Blast") == 3 &&
+                if (UseCooldowns && Combustion && !WoW.IsSpellOnCooldown("Combustion") && WoW.PlayerHasBuff("Rune of Power") && WoW.PlayerSpellCharges("Fire Blast") >= 1 &&
                     WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling ||
-                    UseCooldowns && Combustion && Mirrors && WoW.PlayerSpellCharges("Fire Blast") == 3 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && WoW.PlayerHasBuff("Hot Streak!") &&
+                    UseCooldowns && Combustion && Mirrors && WoW.PlayerSpellCharges("Fire Blast") >= 1 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 2 && WoW.PlayerHasBuff("Hot Streak!") &&
                     !WoW.IsSpellOnCooldown("Combustion") && !WoW.IsSpellOnCooldown("Mirror Image") && !WoW.PlayerIsCasting && !WoW.PlayerIsChanneling)
                 {
                     WoW.CastSpell("Combustion");
@@ -746,17 +748,17 @@ namespace CloudMagic.Rotation
                     WoW.CastSpell("Dragon's Breath");
                     return;
                 }
-                if (WoW.PlayerSpellCharges("Phoenix's Flames") > 2 && !WoW.PlayerHasBuff("Combustion") && WoW.SpellCooldownTimeRemaining("Combustion") > 20 && WoW.CanCast("Phoenix's Flames") &&
+                if (WoW.PlayerSpellCharges("Phoenix's Flames") > 2 && !WoW.PlayerHasBuff("Combustion") && WoW.SpellCooldownTimeRemaining("Combustion") > 2000 && WoW.CanCast("Phoenix's Flames") &&
                     WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!") && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.IsSpellOnCooldown("Fire Blast") &&
-                    WoW.SpellCooldownTimeRemaining("Fire Blast") > 1.1 && WoW.LastSpell != "Phoenix's Flames" && WoW.LastSpell != "Fire Blast" ||
-                    WoW.SpellCooldownTimeRemaining("Combustion") < 20 && WoW.CanCast("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!") &&
+                    WoW.SpellCooldownTimeRemaining("Fire Blast") > 110 && WoW.LastSpell != "Phoenix's Flames" && WoW.LastSpell != "Fire Blast" ||
+                    WoW.SpellCooldownTimeRemaining("Combustion") < 2000 && WoW.CanCast("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && !WoW.PlayerHasBuff("Hot Streak!") &&
                     WoW.PlayerSpellCharges("Phoenix's Flames") == 3 && WoW.LastSpell != "Phoenix's Flames" && WoW.LastSpell != "Fire Blast")
                 {
                     WoW.CastSpell("Phoenix's Flames");
                     return;
                 }
                 if (WoW.CanCast("Phoenix's Flames") && WoW.PlayerHasBuff("Heating Up") && WoW.PlayerHasBuff("Combustion") && !WoW.PlayerHasBuff("Hot Streak!") &&
-                    WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.SpellCooldownTimeRemaining("Fire Blast") > 0.5 && WoW.LastSpell != "Phoenix's Flames" &&
+                    WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 && WoW.SpellCooldownTimeRemaining("Fire Blast") > 5000 && WoW.LastSpell != "Phoenix's Flames" &&
                     WoW.LastSpell != "Fire Blast")
                 {
                     WoW.CastSpell("Phoenix's Flames");
@@ -776,7 +778,7 @@ namespace CloudMagic.Rotation
                 }
                 // Legendary Bracers Support.
                 if (Legendary && WoW.CanCast("Pyroblast") && !WoW.WasLastCasted("Pyroblast") && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") &&
-                    WoW.PlayerBuffTimeRemaining("Marquee Bindings of the Sun King") > 4 && WoW.PlayerHasBuff("Marquee Bindings of the Sun King") && !WoW.PlayerHasBuff("Hot Streak!") ||
+                    WoW.PlayerBuffTimeRemaining("Marquee Bindings of the Sun King") > 400 && WoW.PlayerHasBuff("Marquee Bindings of the Sun King") && !WoW.PlayerHasBuff("Hot Streak!") ||
                     (!WoW.PlayerHasBuff("Combustion") && !WoW.WasLastCasted("Pyroblast") && WoW.PlayerHasBuff("Ice Floes") && !WoW.PlayerIsCasting &&
                      WoW.PlayerHasBuff("Marquee Bindings of the Sun King") && !WoW.PlayerHasBuff("Hot Streak!")))
                 {
@@ -810,13 +812,13 @@ namespace CloudMagic.Rotation
                     WoW.CastSpell("Fireball");
                     return;
                 }
-                if (WoW.SpellCooldownTimeRemaining("Combustion") > 20 && WoW.SpellCooldownTimeRemaining("Phoenix's Flames") > 1.3 && WoW.PlayerIsCasting && WoW.LastSpell != "Phoenix's Flame" &&
+                if (WoW.SpellCooldownTimeRemaining("Combustion") > 200 && WoW.SpellCooldownTimeRemaining("Phoenix's Flames") > 130 && WoW.PlayerIsCasting && WoW.LastSpell != "Phoenix's Flame" &&
                     WoW.LastSpell != "Fire Blast" && WoW.PlayerHasBuff("Heating Up") && WoW.PlayerSpellCharges("Fire Blast") >= 1 && !WoW.PlayerHasBuff("Hot Streak!"))
                 {
                     WoW.CastSpell("Fire Blast");
                     return;
                 }
-                if (WoW.SpellCooldownTimeRemaining("Combustion") > 20 && WoW.LastSpell != "Phoenix's Flame" && WoW.LastSpell != "Fire Blast" && WoW.PlayerHasBuff("Heating Up") &&
+                if (WoW.SpellCooldownTimeRemaining("Combustion") > 200 && WoW.LastSpell != "Phoenix's Flame" && WoW.LastSpell != "Fire Blast" && WoW.PlayerHasBuff("Heating Up") &&
                     WoW.PlayerSpellCharges("Fire Blast") >= 1 && !WoW.PlayerHasBuff("Hot Streak!"))
                 {
                     WoW.CastSpell("Fire Blast");
@@ -842,15 +844,15 @@ namespace CloudMagic.Rotation
                     return;
                 }
                 if (!WoW.PlayerHasBuff("Combustion") && !WoW.IsMoving && WoW.CanCast("Fireball") && !WoW.PlayerIsCasting && WoW.PlayerHasBuff("Heating Up") &&
-                    WoW.SpellCooldownTimeRemaining("Combustion") <= 20 && WoW.PlayerSpellCharges("Fire Blast") >= 1 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 ||
+                    WoW.SpellCooldownTimeRemaining("Combustion") <= 2000 && WoW.PlayerSpellCharges("Fire Blast") >= 1 && WoW.PlayerSpellCharges("Phoenix's Flames") >= 1 ||
                     WoW.CanCast("Fireball") && !WoW.IsMoving && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") && WoW.PlayerHasBuff("Heating Up") &&
-                    WoW.IsSpellOnCooldown("Fire Blast") && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 20 ||
+                    WoW.IsSpellOnCooldown("Fire Blast") && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 2000 ||
                     WoW.CanCast("Fireball") && !WoW.IsMoving && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") && WoW.PlayerHasBuff("Heating Up") &&
-                    !WoW.IsSpellOnCooldown("Fire Blast") && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 20 ||
+                    !WoW.IsSpellOnCooldown("Fire Blast") && WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 2000 ||
                     WoW.CanCast("Fireball") && !WoW.IsMoving && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") && WoW.PlayerHasBuff("Heating Up") &&
-                    WoW.IsSpellOnCooldown("Fire Blast") && !WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") >= 20 ||
+                    WoW.IsSpellOnCooldown("Fire Blast") && !WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") >= 2000 ||
                     WoW.CanCast("Fireball") && !WoW.IsMoving && !WoW.PlayerIsCasting && !WoW.PlayerHasBuff("Combustion") && WoW.PlayerHasBuff("Heating Up") &&
-                    WoW.IsSpellOnCooldown("Fire Blast") && !WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 20)
+                    WoW.IsSpellOnCooldown("Fire Blast") && !WoW.IsSpellOnCooldown("Phoenix's Flames") && WoW.SpellCooldownTimeRemaining("Combustion") <= 2000)
                 {
                     WoW.CastSpell("Fireball");
                 }
@@ -862,7 +864,7 @@ namespace CloudMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=Creepyjoker
-AddonName=Sucstobeyou
+AddonName=smartie
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,190319,Combustion,E

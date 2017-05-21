@@ -2,9 +2,9 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
-using CloudMagic.Helpers;
+using PixelMagic.Helpers;
 
-namespace CloudMagic.Rotation
+namespace PixelMagic.Rotation
 {
     public class DemonHunterHavoc : CombatRoutine
     {

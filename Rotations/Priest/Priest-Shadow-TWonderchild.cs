@@ -553,10 +553,10 @@ namespace CloudMagic.Rotation
             if (WoW.PlayerSpellCharges(SHADOW_WORD_DEATH) == 1 && WoW.Insanity <= txtSWD && WoW.TargetHealthPercent <= 20 && DotsUp())
                 SpellCast(SHADOW_WORD_DEATH);
 
-            if ((!WoW.TargetHasDebuff(VAMPIRIC_TOUCH) || WoW.TargetDebuffTimeRemaining(VAMPIRIC_TOUCH) <= 4) && !MoveCheck() && WoW.LastSpell!= VAMPIRIC_TOUCH && !WoW.PlayerHasBuff(T19_VOID)) //Messy workaround to fix the double VT-Cast, since addon/BLizz API is returning weird values
+            if ((!WoW.TargetHasDebuff(VAMPIRIC_TOUCH) || WoW.TargetDebuffTimeRemaining(VAMPIRIC_TOUCH) <= 400) && !MoveCheck() && WoW.LastSpell!= VAMPIRIC_TOUCH && !WoW.PlayerHasBuff(T19_VOID)) //Messy workaround to fix the double VT-Cast, since addon/BLizz API is returning weird values
                 SpellCast(VAMPIRIC_TOUCH);
                 
-            if ((!WoW.TargetHasDebuff(SHADOW_WORD_PAIN) || WoW.TargetDebuffTimeRemaining(SHADOW_WORD_PAIN) <= 3) && !WoW.PlayerHasBuff(T19_VOID))
+            if ((!WoW.TargetHasDebuff(SHADOW_WORD_PAIN) || WoW.TargetDebuffTimeRemaining(SHADOW_WORD_PAIN) <= 300) && !WoW.PlayerHasBuff(T19_VOID))
                 SpellCast(SHADOW_WORD_PAIN);
             
             if(WoW.TargetHasDebuff(SHADOW_WORD_PAIN) && WoW.TargetHasDebuff(VAMPIRIC_TOUCH) && !MoveCheck() && WoW.IsSpellOnCooldown(MIND_BLAST) && !WoW.PlayerHasBuff(T19_VOID) && WoW.LastSpell != VOID_ERUPTION)
@@ -587,7 +587,7 @@ namespace CloudMagic.Rotation
                 SpellCast(POWER_INFUSION);
             if (PIWaitBox.Checked && WoW.IsSpellOnCooldown(SHADOW_FIEND) && WoW.SpellCooldownTimeRemaining(SHADOW_FIEND) > txtPIWait)
                 SpellCast(POWER_INFUSION);
-            if (SFPIBox.Checked && (WoW.PlayerBuffTimeRemaining(POWER_INFUSION_AURA) == 12 || CheckBloodlust() == 12))
+            if (SFPIBox.Checked && (WoW.PlayerBuffTimeRemaining(POWER_INFUSION_AURA) == 1200 || CheckBloodlust() == 1200))
                 SpellCast(SHADOW_FIEND);
             if (SFWaitBox.Checked && WoW.IsSpellOnCooldown(POWER_INFUSION) && WoW.SpellCooldownTimeRemaining(POWER_INFUSION) > txtSFWait)
                 SpellCast(SHADOW_FIEND);
@@ -640,7 +640,7 @@ namespace CloudMagic.Rotation
 /*
 [AddonDetails.db]
 AddonAuthor=TWonderchild
-AddonName=Pawner
+AddonName=smartie
 WoWVersion=Legion - 70100
 [SpellBook.db]
 Spell,232698,Shadowform,NumPad9
@@ -659,6 +659,7 @@ Spell,10060,Power Infusion,NumPad2
 Spell,34433,Shadowfiend,NumPad3
 Spell,15487,Silence,E
 Spell,47585,Dispersion,NumPad5
+Spell,144259,Kil'jaeden's Burning Wish,D6
 Aura,232698,Shadowform
 Aura,194249,Voidform
 Aura,211657,Void
@@ -675,5 +676,4 @@ Aura,160452,Netherwinds
 Aura,178207,Drums of Fury
 Aura,236430,Norgannon's Foresight
 Item,144259,Kil'jaeden's Burning Wish
-Spell,144259,Kil'jaeden's Burning Wish,D6
 */

@@ -111,6 +111,44 @@ local Spec = { Id ={
 	Interrupt = {	[ 262 ] =  57994 , -- Wind Shear
     [ 264 ] =  57994 , -- Wind Shear
     [ 263 ] =  57994 , -- Wind Shear
+		[ 102 ] =  190984 , -- Solar Wrath
+	[ 103 ] =  5221 , -- Shre
+	[ 105 ] =  190984 , -- Solar Wrat
+	[ 266 ] =  603 , -- Doom
+	[ 265 ] =  980 , -- Agony
+	[ 267 ] =  29722 , -- Incinerat
+	[ 268 ] =  205523 , -- Blackout Strike
+	[ 270 ] =  107428 , -- Rising Sun Kick
+	[ 269 ] =  107428 , -- Rising Sun Kick
+	[ 253 ] =  147362 , -- Counter Shoot
+    [ 254 ] =  147362 , -- Counter Shot
+	[ 255 ] =  190928 , -- Mongoose Bit
+	[ 63 ] =  133 , -- Fireball
+	[ 62 ] =  30451 , -- Arcane Blast
+	[ 64 ] =  116 , -- Frostbolt
+    [ 65 ] =  35395 , -- Crusader Strike
+	[ 66 ] =  53600 , -- Shield of the Righteous
+	[ 70 ] =  35395 , -- Crusader Strike
+    [ 256 ] =  47540 , -- Penance
+	[ 257 ] =  585 , -- Smite
+	[ 258 ] =  8092 , -- Mind Blast
+	[ 104 ] =  33917 , -- Mangle
+	[ 102 ] =  190984 , -- Solar Wrath
+	[ 103 ] =  5221 , -- Shred
+	[ 105 ] =  5176 , -- Solar Wrat
+	[ 251 ] =  49143 , -- Frost Strike
+    [ 252 ] =  85948 , -- Festering Strike
+	[ 250 ] =  49998 , -- Death Strike
+	[ 71 ] =  12294 , -- Mortal Strike
+	[577] = "Demon's Bite",
+	[581] ="Shear",
+	[259] ="Mutilate",
+	[260] ="Saber Slash",
+	[261] ="Backstab",
+	[72] ="Bloodthirst",
+	[73] = "Devastate",}
+
+
 	},
 	Spell = {
 	[ 102 ] =  190984 , -- Solar Wrath

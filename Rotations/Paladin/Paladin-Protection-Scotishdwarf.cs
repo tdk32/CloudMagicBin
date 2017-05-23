@@ -39,9 +39,15 @@ namespace CloudMagic.Rotation
 
         public override Form SettingsForm { get; set; }
 
-        public override string Name => "Protection Paladin by Scotishdwarf r16";
+        public override string Name { get { return "Protection Paladin by Scotishdwarf r16"; } }
 
-        public override string Class => "Paladin";
+        public override string Class
+        {
+            get
+            {
+                return "Paladin";
+            }
+        }
 
         private static bool SeraphimBoss
         {

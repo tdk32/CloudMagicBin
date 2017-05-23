@@ -147,9 +147,6 @@ local Spec = { Id ={
 	[261] ="Backstab",
 	[72] ="Bloodthirst",
 	[73] = "Devastate",}
-
-
-	},
 	Spell = {
 	[ 102 ] =  190984 , -- Solar Wrath
 	[ 103 ] =  5221 , -- Shre

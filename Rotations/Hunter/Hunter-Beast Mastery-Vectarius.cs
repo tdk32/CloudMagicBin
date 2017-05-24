@@ -780,7 +780,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
                         return;
                     }	
 //aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12	
-					if (WoW.CanCast("Aspect of the Wild")&& WoW.Level >= 26&& WoW.HasBossTarget && WoW.PlayerHasBuff("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Aspect of the Wild")&& WoW.Level >= 26&& UseCooldowns && WoW.PlayerHasBuff("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Aspect of the Wild");
                         return;
@@ -903,7 +903,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
                         return;
                     }	
 //aspect_of_the_wild,if=buff.bestial_wrath.up|target.time_to_die<12	
-					if (WoW.CanCast("Aspect of the Wild") && WoW.Level >= 26&& WoW.HasBossTarget && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && WoW.PlayerHasBuff("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Aspect of the Wild") && WoW.Level >= 26&& UseCooldowns && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD && WoW.PlayerHasBuff("Bestial Wrath") && WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Aspect of the Wild");
                         return;

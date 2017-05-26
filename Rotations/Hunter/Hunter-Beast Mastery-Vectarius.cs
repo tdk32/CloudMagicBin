@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using CloudMagic.Helpers;
 using System.ComponentModel;
@@ -21,10 +22,22 @@ namespace CloudMagic.Rotation
 		private NumericUpDown nudAspectoftheTurtlePercentValue;
 		private NumericUpDown nudFeignDeathPercentValue;
 		private NumericUpDown nudCounterShotPercentValue;
-		private NumericUpDown nudIntimidationPercentValue;		
+		private NumericUpDown nudIntimidationPercentValue;	
+		private NumericUpDown nudPotionPercentValue;			
 
 
-		
+		 private bool BL
+        {
+            get
+            {
+				if (WoW.PlayerHasBuff("Bloodlust") || WoW.PlayerHasBuff("Ancient Hysteria") || WoW.PlayerHasBuff("Netherwinds") || WoW.PlayerHasBuff("Drums") || WoW.PlayerHasBuff("Heroism") || WoW.PlayerHasBuff("Time Warp"))
+				{
+					return true;
+				}
+				else
+					return false;
+            }
+        }		
 		 private float GCD
         {
             get
@@ -54,7 +67,8 @@ private float FocusTimetoMax
 		private CheckBox IntimidationBox;
 		// Items
 		private CheckBox KilJaedenBox;			
-
+		private CheckBox PotionBox;
+		private CheckBox PotBox;		
 
 		// DEF cds
 		private CheckBox ExhilarationBox;
@@ -66,8 +80,28 @@ private float FocusTimetoMax
 		//dps cds
 		private CheckBox AspectoftheWildBox;
 		
-		
+		private static bool Pot
+        {
+            get
+            {
+                var Pot = ConfigFile.ReadValue("HunterBeastmastery", "Pot").Trim();
 
+                return Pot != "" && Convert.ToBoolean(Pot);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "Pot", value.ToString()); }
+        }
+		
+		private static bool Potion
+        {
+            get
+            {
+                var Potion = ConfigFile.ReadValue("HunterBeastmastery", "Potion").Trim();
+
+                return Potion != "" && Convert.ToBoolean(Potion);
+            }
+            set { ConfigFile.WriteValue("HunterBeastmastery", "Potion", value.ToString()); }
+        }
+		
 		private static bool KilJaeden
         {
             get
@@ -199,6 +233,10 @@ private float FocusTimetoMax
 			if (ConfigFile.ReadValue("Hunter", "Intimidation Percent") == "")
             {
                 ConfigFile.WriteValue("Hunter", "Intimidation Percent", "80");
+            }	
+			if (ConfigFile.ReadValue("Hunter", "Potion Percent") == "")
+            {
+                ConfigFile.WriteValue("Hunter", "Potion Percent", "30");
             }			
 		   
 SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStartPosition.CenterScreen, Width = 400, Height = 500, ShowIcon = false};
@@ -243,10 +281,18 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
             nudIntimidationPercentValue = new NumericUpDown 
 			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "Intimidation Percent"), 
 			Left = 215, 
-			Top =275,
+			Top =272,
 			Size = new Size (40, 10)
 			};
-			SettingsForm.Controls.Add(nudIntimidationPercentValue);					
+			SettingsForm.Controls.Add(nudIntimidationPercentValue);			
+
+            nudPotionPercentValue = new NumericUpDown 
+			{Minimum = 0, Maximum = 100, Value = ConfigFile.ReadValue<decimal>("Hunter", "Potion Percent"), 
+			Left = 215, 
+			Top =347,
+			Size = new Size (40, 10)
+			};
+			SettingsForm.Controls.Add(nudPotionPercentValue);					
 			
 			
 
@@ -407,22 +453,49 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
             };
 			
 			lblKilJaedenBox.ForeColor = Color.Black;
-            SettingsForm.Controls.Add(lblKilJaedenBox);			
-		   
+            SettingsForm.Controls.Add(lblKilJaedenBox);	
 
+			var lblPotionBox = new Label
+            {
+                Text =
+                    "Healthstone/Potion @",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 350
+            };
+			
+			lblPotionBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblPotionBox);				
+		   
+			var lblPotBox = new Label
+            {
+                Text =
+                    "Power Potion",
+                Size = new Size(270, 15),
+                Left = 100,
+                Top = 375
+            };
+			
+			lblPotBox.ForeColor = Color.Black;
+            SettingsForm.Controls.Add(lblPotBox);				
+		   
 			
 			
 			
 			
-			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 375, Size = new Size(120, 31)};
+			var cmdSave = new Button {Text = "Save", Width = 65, Height = 25, Left = 5, Top = 400, Size = new Size(120, 31)};
 			
-			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 375, Size = new Size(120, 31)};
+			var cmdReadme = new Button {Text = "Macros! Use Them", Width = 65, Height = 25, Left = 125, Top = 400, Size = new Size(120, 31)};
 			
  
 
 //items
-            KilJaedenBox = new CheckBox {Checked = KilJaeden, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 325};		
-            SettingsForm.Controls.Add(KilJaedenBox);
+            KilJaedenBox = new CheckBox {Checked = KilJaeden, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 325};	
+			SettingsForm.Controls.Add(KilJaedenBox);
+            PotionBox = new CheckBox {Checked = Potion, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 350};				
+            SettingsForm.Controls.Add(PotionBox);
+            PotBox = new CheckBox {Checked = Pot, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 375};				
+            SettingsForm.Controls.Add(PotBox);			
 //pet control			
 			HealPetBox = new CheckBox {Checked = HealPet, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 250};		
 			IntimidationBox = new CheckBox {Checked = Intimidation, TabIndex = 8, Size = new Size(14, 14), Left = 70, Top = 275};				
@@ -460,6 +533,8 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 
 			
             KilJaedenBox.CheckedChanged += KilJaeden_Click;    
+			PotionBox.CheckedChanged += Potion_Click;  
+			PotBox.CheckedChanged += Pot_Click; 			
             HealPetBox.CheckedChanged += HealPet_Click;		
             IntimidationBox.CheckedChanged += Intimidation_Click;				
 			
@@ -485,7 +560,9 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 			nudAspectoftheTurtlePercentValue.BringToFront();
 			nudFeignDeathPercentValue.BringToFront();		
 			
-            KilJaedenBox.BringToFront();	
+            KilJaedenBox.BringToFront();
+            PotionBox.BringToFront();
+            PotBox.BringToFront();			
             HealPetBox.BringToFront();	
             IntimidationBox.BringToFront();				
 			
@@ -504,7 +581,9 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
         {
 
 
-            KilJaeden = KilJaedenBox.Checked;		
+            KilJaeden = KilJaedenBox.Checked;	
+            Potion = PotionBox.Checked;	
+            Pot = PotionBox.Checked;				
             HealPet = HealPetBox.Checked;			
             Intimidation = IntimidationBox.Checked;				
 			
@@ -536,7 +615,15 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
         {
             KilJaeden = KilJaedenBox.Checked;
         }			
-			
+
+		private void Potion_Click(object sender, EventArgs e)
+        {
+            Potion = PotionBox.Checked;
+        }	
+		private void Pot_Click(object sender, EventArgs e)
+        {
+            Pot = PotBox.Checked;
+        }		
 //pet control			
 		private void HealPet_Click(object sender, EventArgs e)
         {
@@ -632,7 +719,27 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
                         WoW.CastSpell("AspectoftheTurtle");
                         return;
                     }
-	
+
+                    if (KilJaeden && WoW.CanCast("Kil'jaeden's Burning Wish") && !WoW.ItemOnCooldown("Kil'jaeden's Burning Wish"))
+					{
+						WoW.CastSpell("Kil'jaeden's Burning Wish") ;
+						return;
+					}					
+                if ((WoW.CanCast("Healthstone") || WoW.CanCast("Potion"))
+                    && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1)
+                    && (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion"))
+                    && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "Potion Percent") && WoW.HealthPercent != 0)
+                {
+                    Thread.Sleep(500);
+                    WoW.CastSpell("Healthstone");
+                    WoW.CastSpell("Potion");
+                    return;
+                }					
+                    if (BL && WoW.CanCast("Pot") && !WoW.PlayerHasBuff("Pot") && WoW.ItemCount("Pot") >= 1 && !WoW.ItemOnCooldown("Healthstone"))
+					{
+						WoW.CastSpell("Pot") ;
+						return;
+					}	
 					
                     if (!WoW.HasPet && WoW.CanCast("Wolf"))
 					{
@@ -978,13 +1085,12 @@ Spell,5116,Concussive,None
 Spell,109304,Exhilaration,V
 Spell,186265,AspectoftheTurtle,G
 Spell,5384,FeignDeath,F2
-Spell,127834,Ancient Healing Potion,F5
+Spell,127834,Potion,NumPad2
 Spell,143940,Silkweave Bandage,None
 Spell,55709,Phoenix,F6
-Spell,5512,Healthstone,F7
+Spell,5512,Healthstone,NumPad2
 Spell,982,Revive Pet,X
 Spell,136,Heal Pet,X
-Spell,142117,Potion Power,F10
 Spell,144259,Kil'jaeden's Burning Wish,F4
 Spell,194386,Volley,F
 Spell,80483,Arcane Torrent,F3
@@ -992,6 +1098,7 @@ Spell,53209,Chimaera Shot,F8
 Spell,26297,Berserking,F9
 Spell,201430,Stampede,C
 Spell,24394,Intimidation,none
+Spell,142117,Pot,NumPad1
 Aura,217200,Dire Frenzy
 Aura,186265,AspectoftheTurtle
 Aura,136,Heal Pet
@@ -1003,12 +1110,15 @@ Aura,90355,Ancient Hysteria
 Aura,160452,Netherwinds
 Aura,146613,Drums
 Aura,32182,Heroism
-Aura,229206,Potion Power
+Aura,229206,Pot
 Aura,19574,Bestial Wrath
 Aura,118455,Beast Cleave
 Aura,193530,Aspect of the Wild
 Aura,194386,Volley
 Aura,137080,Roar of the Seven Lions
 Item,144259,Kil'jaeden's Burning Wish
+Item,142117,Pot
+Item,5512,Healthstone
+Item,127834,Potion
 
 */

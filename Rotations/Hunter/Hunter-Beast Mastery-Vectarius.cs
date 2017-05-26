@@ -735,7 +735,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
                     WoW.CastSpell("Potion");
                     return;
                 }					
-                    if (BL && WoW.CanCast("Pot") && !WoW.PlayerHasBuff("Pot") && WoW.ItemCount("Pot") >= 1 && !WoW.ItemOnCooldown("Healthstone"))
+                    if (BL && WoW.CanCast("Pot") && !WoW.PlayerHasBuff("Pot") && WoW.ItemCount("Pot") >= 1 && !WoW.ItemOnCooldown("Pot"))
 					{
 						WoW.CastSpell("Pot") ;
 						return;

@@ -479,7 +479,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 			var lblPotBox = new Label
             {
                 Text =
-                    "Potion of Prolonged Power with Blood Lust",
+                    "Potion of Prolonged Power with Bloodlust",
                 Size = new Size(270, 15),
                 Left = 100,
                 Top = 375

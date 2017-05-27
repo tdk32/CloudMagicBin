@@ -2523,7 +2523,7 @@ Spell,131894,A Murder of Crows,D5
 Spell,120360,Barrage,D6
 Spell,147362,Counter Shot,D0
 Spell,193530,Aspect of the Wild,D9
-Spell,20572,Blood Fury,F9
+Spell,20572,Blood Fury,F3
 Spell,207068,Titan's Thunder,D7
 Spell,5116,Concussive,None
 Spell,109304,Exhilaration,V
@@ -2535,13 +2535,13 @@ Spell,55709,Phoenix,F6
 Spell,5512,Healthstone,NumPad2
 Spell,982,Revive Pet,X
 Spell,136,Heal Pet,X
-Spell,144259,Kil'jaeden's Burning Wish,F4
+Spell,144259,Kil'jaeden's Burning Wish,NumPad4
 Spell,194386,Volley,F
 Spell,80483,Arcane Torrent,F3
 Spell,53209,Chimaera Shot,F8
-Spell,26297,Berserking,F9
+Spell,26297,Berserking,F3
 Spell,201430,Stampede,C
-Spell,24394,Intimidation,none
+Spell,24394,Intimidation,None
 Spell,142117,Pot,NumPad1
 Aura,217200,Dire Frenzy
 Aura,186265,AspectoftheTurtle
@@ -2579,7 +2579,7 @@ Spell,212436,Butchery,C
 Spell,187707,Muzzle,F
 Spell,194407,Spitting Cobra,C
 Spell,187708,Carve,F7
-Spell,190925,Harpoon,Numpad1
+Spell,190925,Harpoon,Numpad5
 Spell,162488,Steel Trap,D5
 Spell,201078,Snake Hunter,D0
 Aura,190931,Mongoose Fury

@@ -1,6 +1,6 @@
 -- Configurable Variables
 local size = 1	-- this is the size of the "pixels" at the top of the screen that will show stuff, currently 5x5 because its easier to see and debug with
-local CMD = {WoWGuiStart = "ALT-Z", WoWGuiMode = "ALT-C", WoWGuiCoolDown = "ALT-X", WoWGuiAuto = "ALT-V"}
+
 local GuiBaseFrame = CreateFrame("frame", "RecountGui", UIParent)
 local GuiStuff = {On = 1, Rotation = 0,CoolDown = 0,Mode = .02, Auto = 0}
 local GuiControlFrame = {}
@@ -12,7 +12,16 @@ for i=1, 2 do
 	GuiControlFrame[i].t = GuiControlFrame[i]:CreateTexture()
 	GuiControlFrame[i].t:SetColorTexture(1, 1, 1, 1)
 	GuiControlFrame[i].t:SetAllPoints(GuiControlFrame[i])
-	GuiControlFrame[i]:Show()
+		
+end
+do
+	if GuiBaseFrame:IsVisible() == false then
+		GuiStuff.On = 1
+		GuiControlFrame[2].t:SetColorTexture(GuiStuff.Auto, 0, GuiStuff.On, 1)
+	elseif GuiBaseFrame:IsVisible() then
+		GuiStuff.On = 0
+		GuiControlFrame[2].t:SetColorTexture(GuiStuff.Auto, 0, GuiStuff.On, 1)
+	end		
 end
 Global_Npc_Nameplate = 0
 GuiControlFrame[1].t:SetColorTexture(GuiStuff.Rotation, GuiStuff.CoolDown, GuiStuff.Mode, 1)
@@ -107,12 +116,12 @@ RotationNpc:SetTextColor(1, 1, 1, .5)
 local function rotationNPCUdate()
 		RotationNpc:SetText(format("Targets : %2d",Global_Npc_Nameplate))
 	if GuiStuff.Auto == 0 then return end 
-    if Global_Npc_Nameplate >= Auto.CLEAVE and Global_Npc_Nameplate < Auto.AOE then 
+    if Global_Npc_Nameplate >= Auto.Cleave and Global_Npc_Nameplate < Auto.AOE then 
 		GuiBaseFrame.ModeOn = "Cleave"	
 		GuiStuff.Mode = .02
 		GuiBaseFrame.Mode = GuiBaseFrame.Cleave.."Cleave|r"
 	end
-	if Global_Npc_Nameplate <= Auto.SINGLE or Global_Npc_Nameplate < Auto.CLEAVE and Auto.CLEAVE ~= 99 or Auto.CLEAVE == 99 and Global_Npc_Nameplate < Auto.AOE  then
+	if Global_Npc_Nameplate <= Auto.Single or Global_Npc_Nameplate < Auto.Cleave and Auto.Cleave ~= 99 or Auto.Cleave == 99 and Global_Npc_Nameplate < Auto.AOE  then
 		GuiBaseFrame.ModeOn = "Single"	
 		GuiStuff.Mode = .01
 		GuiBaseFrame.Mode = GuiBaseFrame.On.."Single|r"

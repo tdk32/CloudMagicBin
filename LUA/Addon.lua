@@ -3,6 +3,7 @@ local size = 1;	-- this is the size of the "pixels" at the top of the screen tha
 
 ---Tables
 local npcDetect = {PlatesOn = 0,enemiesPlate = 0, activeUnitPlates = {}, npcCountFrame = nil}
+Global_Npc_Nameplate = npcDetect.enemiesPlate
 local EquipmentManger = {
 invSlots = {
 1,3,5,7,10,15
@@ -111,7 +112,7 @@ local Spec = { Id ={
 	Interrupt = {	[ 262 ] =  57994 , -- Wind Shear
     [ 264 ] =  57994 , -- Wind Shear
     [ 263 ] =  57994 , -- Wind Shear
-		[ 102 ] =  190984 , -- Solar Wrath
+	[ 102 ] =  190984 , -- Solar Wrath
 	[ 103 ] =  5221 , -- Shre
 	[ 105 ] =  190984 , -- Solar Wrat
 	[ 266 ] =  603 , -- Doom
@@ -140,13 +141,13 @@ local Spec = { Id ={
     [ 252 ] =  85948 , -- Festering Strike
 	[ 250 ] =  49998 , -- Death Strike
 	[ 71 ] =  12294 , -- Mortal Strike
-	[577] = "Demon's Bite",
-	[581] ="Shear",
+	[577] = 162243,
+	[581] =203782,
 	[259] ="Mutilate",
 	[260] ="Saber Slash",
 	[261] ="Backstab",
 	[72] ="Bloodthirst",
-	[73] = "Devastate",},
+	[73] = "Devastate",	},
 	Spell = {
 	[ 102 ] =  190984 , -- Solar Wrath
 	[ 103 ] =  5221 , -- Shre
@@ -191,7 +192,7 @@ local Spec = { Id ={
 
 -- Actual Addon Code below
 
-local parent = CreateFrame("frame", "Recount", UIParent)
+parent = CreateFrame("frame", "ParentFrame", UIParent)
 parent:SetSize(55 * size, 20 * size);  -- Width, Height
 parent:SetPoint("TOPLEFT", 0, 0)
 parent:RegisterEvent("ADDON_LOADED")
@@ -274,6 +275,7 @@ local function activeEnemies()
             end
         end
     end
+	Global_Npc_Nameplate = npcDetect.enemiesPlate 
     npcDetect.enemiesPlate = npcDetect.enemiesPlate/100
     
 end
@@ -1795,10 +1797,18 @@ local function InitializeTwo()
 	if(table.getn(cooldowns) ~= 0) then
 		spellOverlayedFrames[table.maxn (spellOverlayedFrames)]:SetScript("OnUpdate", updateIsSpellOverlayedFrames)
 	end
-		for i = 1, 5 do
+		npcDetect.npcCountFrame = CreateFrame("frame", "", parent)
+		npcDetect.npcCountFrame:SetSize(size, size)
+		npcDetect.npcCountFrame:SetPoint("TOPLEFT", size*(0), -size *12 )   --  row 0,  column 20
+		npcDetect.npcCountFrame.t = npcDetect.npcCountFrame:CreateTexture()        
+		npcDetect.npcCountFrame.t:SetColorTexture(1, 1, 1, alphaColor)
+		npcDetect.npcCountFrame.t:SetAllPoints(npcDetect.npcCountFrame)
+		npcDetect.npcCountFrame:Show()
+		npcDetect.npcCountFrame:SetScript("OnUpdate",NameplateFrameUPDATE)
+	for i = 1, 5 do
 		PlayerStatFrame[i] = CreateFrame("frame", "", parent)
 		PlayerStatFrame[i]:SetSize(size, size)
-		PlayerStatFrame[i]:SetPoint("TOPLEFT", size*(i-1), -size *23 )   --  row 1-5,  column 24
+		PlayerStatFrame[i]:SetPoint("TOPLEFT", size*(i), -size *12 )   --  row 2-6,  column 13
 		PlayerStatFrame[i].t =PlayerStatFrame[i]:CreateTexture()        
 		PlayerStatFrame[i].t:SetColorTexture(1, 1, 1, alphaColor)
 		PlayerStatFrame[i].t:SetAllPoints(PlayerStatFrame[i])
@@ -1808,15 +1818,7 @@ local function InitializeTwo()
 		PlayerStatFrame[table.maxn (PlayerStatFrame)]:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 		PlayerStatFrame[table.maxn (PlayerStatFrame)]:RegisterEvent("PLAYER_REGEN_DISABLED")
 		PlayerStatFrame[table.maxn (PlayerStatFrame)]:SetScript("OnEvent",Talents)
-
-		npcDetect.npcCountFrame = CreateFrame("frame", "", parent)
-		npcDetect.npcCountFrame:SetSize(size, size)
-		npcDetect.npcCountFrame:SetPoint("TOPLEFT", size*(0), -size *22 )   --  row 0,  column 20
-		npcDetect.npcCountFrame.t = npcDetect.npcCountFrame:CreateTexture()        
-		npcDetect.npcCountFrame.t:SetColorTexture(1, 1, 1, alphaColor)
-		npcDetect.npcCountFrame.t:SetAllPoints(npcDetect.npcCountFrame)
-		npcDetect.npcCountFrame:Show()
-		npcDetect.npcCountFrame:SetScript("OnUpdate",NameplateFrameUPDATE)
+	-- Rows 2-6 column 13
 end
 local function eventHandler(self, event, ...)
 	local arg1 = ...

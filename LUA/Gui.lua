@@ -1,7 +1,6 @@
 -- Configurable Variables
 local size = 1	-- this is the size of the "pixels" at the top of the screen that will show stuff, currently 5x5 because its easier to see and debug with
-
-
+local CMD = {WoWGuiStart = "ALT-Z", WoWGuiMode = "ALT-C", WoWGuiCoolDown = "ALT-X", WoWGuiAuto = "ALT-V"}
 local GuiBaseFrame = CreateFrame("frame", "RecountGui", UIParent)
 local GuiStuff = {On = 1, Rotation = 0,CoolDown = 0,Mode = .02, Auto = 0}
 local GuiControlFrame = {}
@@ -15,12 +14,13 @@ for i=1, 2 do
 	GuiControlFrame[i].t:SetAllPoints(GuiControlFrame[i])
 	GuiControlFrame[i]:Show()
 end
+Global_Npc_Nameplate = 0
 GuiControlFrame[1].t:SetColorTexture(GuiStuff.Rotation, GuiStuff.CoolDown, GuiStuff.Mode, 1)
 GuiControlFrame[2].t:SetColorTexture(GuiStuff.Auto, 0, GuiStuff.On, 1)
 GuiBaseFrame.On = "|cFF00FF00"
 GuiBaseFrame.Off = "|cFFFF0000"
 GuiBaseFrame.Cleave = "|c008C8000"
-GuiBaseFrame.RotationOn = true
+GuiBaseFrame.RotationOn = false
 GuiBaseFrame.Rotation = GuiBaseFrame.Off.."Off|r"
 GuiBaseFrame.CoolDownOn = false
 GuiBaseFrame.CoolDown = GuiBaseFrame.Off.."Off|r"
@@ -106,16 +106,18 @@ RotationNpc:SetText(format("Targets : %2d",Global_Npc_Nameplate))
 RotationNpc:SetTextColor(1, 1, 1, .5)
 local function rotationNPCUdate()
 		RotationNpc:SetText(format("Targets : %2d",Global_Npc_Nameplate))
-	if GuiStuff.Auto == 0 then return end
-    if Global_Npc_Nameplate == Auto.CLEAVE then 
+	if GuiStuff.Auto == 0 then return end 
+    if Global_Npc_Nameplate >= Auto.CLEAVE and Global_Npc_Nameplate < Auto.AOE then 
 		GuiBaseFrame.ModeOn = "Cleave"	
 		GuiStuff.Mode = .02
 		GuiBaseFrame.Mode = GuiBaseFrame.Cleave.."Cleave|r"
-	elseif Global_Npc_Nameplate == Auto.SINGLE then
+	end
+	if Global_Npc_Nameplate <= Auto.SINGLE or Global_Npc_Nameplate < Auto.CLEAVE and Auto.CLEAVE ~= 99 or Auto.CLEAVE == 99 and Global_Npc_Nameplate < Auto.AOE  then
 		GuiBaseFrame.ModeOn = "Single"	
 		GuiStuff.Mode = .01
 		GuiBaseFrame.Mode = GuiBaseFrame.On.."Single|r"
-	elseif Global_Npc_Nameplate >= Auto.AOE then 
+	end
+	if Global_Npc_Nameplate >= Auto.AOE then 
 		GuiBaseFrame.ModeOn = "AOE"	
 		GuiStuff.Mode = .03
 		GuiBaseFrame.Mode = GuiBaseFrame.Off.."AOE|r"
@@ -151,10 +153,11 @@ RotationModeButton:SetScript("OnClick", function(self, arg1)
 	RotationMode:SetText(format("Mode : %-5s",GuiBaseFrame.Mode))
 	GuiControlFrame[1].t:SetColorTexture(GuiStuff.Rotation, GuiStuff.CoolDown, GuiStuff.Mode, 1)
 end)
+SetBindingClick(CMD.WoWGuiMode,RotationModeButton:GetName())
 
 
 
-local RotationOnButton = CreateFrame("Button", "ModeButton", GuiBaseFrame) -- Parent the button to the main frame
+local RotationOnButton = CreateFrame("Button", "On/OffButton", GuiBaseFrame) -- Parent the button to the main frame
 RotationOnButton:SetPoint("TopLeft",GuiBaseFrame, 10, -20)
 RotationOnButton.tex = RotationOnButton:CreateTexture("ARTWORK");
 RotationOnButton.tex:SetAllPoints();
@@ -176,6 +179,7 @@ RotationOnButton:SetScript("OnClick", function(self, arg1)
 	RotationText:SetText(format("Rotation :        %3s",GuiBaseFrame.Rotation))
 	GuiControlFrame[1].t:SetColorTexture(GuiStuff.Rotation, GuiStuff.CoolDown, GuiStuff.Mode, 1)
 end)
+SetBindingClick(CMD.WoWGuiStart, RotationOnButton:GetName())
 
 local RotationAutoButton = CreateFrame("Button", "AutoButton", GuiBaseFrame) -- Parent the button to the main frame
 RotationAutoButton:SetPoint("BottomLeft",GuiBaseFrame,130, 10)
@@ -199,10 +203,10 @@ RotationAutoButton:SetScript("OnClick", function(self, arg1)
 	RotationAuto:SetText(format("Auto: %-3s",GuiBaseFrame.AutoOn))
 	GuiControlFrame[2].t:SetColorTexture(GuiStuff.Auto, 0, GuiStuff.On, 1)
 end)
+SetBindingClick(CMD.WoWGuiAuto,RotationAutoButton:GetName())
 
 
-
-local CoolDownOnButton = CreateFrame("Button", "ModeButton", GuiBaseFrame) -- Parent the button to the main frame
+local CoolDownOnButton = CreateFrame("Button", "CoolDownButton", GuiBaseFrame) -- Parent the button to the main frame
 CoolDownOnButton:SetPoint("TopLeft",GuiBaseFrame, 160, -20)
 CoolDownOnButton.tex = CoolDownOnButton:CreateTexture("ARTWORK");
 CoolDownOnButton.tex:SetAllPoints();
@@ -224,6 +228,7 @@ CoolDownOnButton:SetScript("OnClick", function(self, arg1)
 	CoolDownText:SetText(format("Cool Down : %-3s ", GuiBaseFrame.CoolDown ))
 	GuiControlFrame[1].t:SetColorTexture(GuiStuff.Rotation, GuiStuff.CoolDown, GuiStuff.Mode, 1)
 end)
+SetBindingClick(CMD.WoWGuiCoolDown,CoolDownOnButton:GetName())
 
 local SLASH_COMMAND = "/CM"
 local function slashHandler(param,editbox)
@@ -242,4 +247,3 @@ end
 
 SlashCmdList["COMMAND"] = slashHandler
 SLASH_COMMAND1 = "/CM"
-

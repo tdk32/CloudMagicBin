@@ -12,16 +12,7 @@ for i=1, 2 do
 	GuiControlFrame[i].t = GuiControlFrame[i]:CreateTexture()
 	GuiControlFrame[i].t:SetColorTexture(1, 1, 1, 1)
 	GuiControlFrame[i].t:SetAllPoints(GuiControlFrame[i])
-		
-end
-do
-	if GuiBaseFrame:IsVisible() == false then
-		GuiStuff.On = 1
-		GuiControlFrame[2].t:SetColorTexture(GuiStuff.Auto, 0, GuiStuff.On, 1)
-	elseif GuiBaseFrame:IsVisible() then
-		GuiStuff.On = 0
-		GuiControlFrame[2].t:SetColorTexture(GuiStuff.Auto, 0, GuiStuff.On, 1)
-	end		
+	GuiControlFrame[i]:Show()
 end
 Global_Npc_Nameplate = 0
 GuiControlFrame[1].t:SetColorTexture(GuiStuff.Rotation, GuiStuff.CoolDown, GuiStuff.Mode, 1)
@@ -67,6 +58,16 @@ end)
 GuiBaseFrame.tex = GuiBaseFrame:CreateTexture("ARTWORK");
 GuiBaseFrame.tex:SetAllPoints();
 GuiBaseFrame.tex:SetColorTexture(0, 0, 0, .5)
+GuiBaseFrame:Hide()
+do
+	if GuiBaseFrame:IsVisible() == false then
+		GuiStuff.On = 0
+		GuiControlFrame[2].t:SetColorTexture(GuiStuff.Auto, 0, GuiStuff.On, 1)
+	elseif GuiBaseFrame:IsVisible() then
+		GuiStuff.On = 1
+		GuiControlFrame[2].t:SetColorTexture(GuiStuff.Auto, 0, GuiStuff.On, 1)
+	end		
+end
 
 local CloseButton = CreateFrame("Button", "CloseButton", GuiBaseFrame, "UIPanelCloseButton") -- Parent the button to the main frame
 CloseButton:SetPoint("TOPRIGHT",GuiBaseFrame, -5, -5)

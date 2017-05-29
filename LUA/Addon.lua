@@ -767,13 +767,16 @@ local function AutoAtacking()
 end
 
 local function updateIsPlayer()
+	local target = {player = 0,threat = 0}
     if UnitIsPlayer("target")  then        
-        targetIsPlayerFrame.t:SetColorTexture(1, 0, 0, alphaColor)
-    else 
-		targetIsPlayerFrame.t:SetColorTexture(1, 1, 1, alphaColor)
+	    target.player = 1
     end
+	
+	if select(1,UnitDetailedThreatSituation("player", "target")) then
+		target.threat = 1
+	end
+	targetIsPlayerFrame.t:SetColorTexture(target.player,target.threat,1, alphaColor)
 end
-
 local function updateOutdoors()
     if IsOutdoors() then        
         flagFrame.t:SetColorTexture(1, 0, 0, alphaColor) -- red = outside
@@ -1691,6 +1694,7 @@ local function InitializeOne()
     targetIsPlayerFrame.t:SetAllPoints(targetIsPlayerFrame)
     targetIsPlayerFrame:Show()
 	targetIsPlayerFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+	targetIsPlayerFrame:RegisterUnitEvent("UNIT_HEALTH","target")
     targetIsPlayerFrame:SetScript("OnEvent", updateIsPlayer)
 	
     flagFrame = CreateFrame("frame","", parent);

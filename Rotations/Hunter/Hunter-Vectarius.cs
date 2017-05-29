@@ -719,14 +719,14 @@ Log.Write("Current Ingame Spec" + WoW.PlayerSpec, Color.Red);
                 if ((WoW.CanCast("Healthstone") || WoW.CanCast("Potion"))
                     && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1)
                     && (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion"))
-                    && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "Potion Percent") && WoW.HealthPercent != 0)
+                    && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "Potion Percent") && WoW.HealthPercent != 0 && Potion)
                 {
                     Thread.Sleep(500);
                     WoW.CastSpell("Healthstone");
                     WoW.CastSpell("Potion");
                     return;
                 }					
-                    if (BL && WoW.CanCast("Pot") && !WoW.PlayerHasBuff("Pot") && WoW.ItemCount("Pot") >= 1 && !WoW.ItemOnCooldown("Pot"))
+                    if (Pot && BL && WoW.CanCast("Pot") && !WoW.PlayerHasBuff("Pot") && WoW.ItemCount("Pot") >= 1 && !WoW.ItemOnCooldown("Pot"))
 					{
 						WoW.CastSpell("Pot") ;
 						return;

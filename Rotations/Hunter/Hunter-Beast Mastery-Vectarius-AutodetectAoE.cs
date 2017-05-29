@@ -711,7 +711,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
                 if ((WoW.CanCast("Healthstone") || WoW.CanCast("Potion"))
                     && (WoW.ItemCount("Healthstone") >= 1 || WoW.ItemCount("Potion") >= 1)
                     && (!WoW.ItemOnCooldown("Healthstone") || !WoW.ItemOnCooldown("Potion"))
-                    && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "Potion Percent") && WoW.HealthPercent != 0)
+                    && WoW.HealthPercent <= ConfigFile.ReadValue<int>("Hunter", "Potion Percent") && WoW.HealthPercent != 0 && Potion)
                 {
                     Thread.Sleep(500);
                     WoW.CastSpell("Healthstone");

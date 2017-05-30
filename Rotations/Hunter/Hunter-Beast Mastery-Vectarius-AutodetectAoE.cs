@@ -213,6 +213,7 @@ private float FocusTimetoMax
 		
         public override void Initialize()
         {
+				Log.Write("Auto AoE optimized for WQs", Color.Green);	
            
 			if (ConfigFile.ReadValue("Hunter", "AspectoftheTurtle Percent") == "")
             {
@@ -668,7 +669,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 
         private static bool lastNamePlate = true;
 		public override int CLEAVE { get { return 99; } } //please Set between 1-99 NpC in range for AOE  if not desired set to 99
-        public override int AOE { get { return 2; } }//please Set between 1-99 NpC in range for Cleave if not desired set to 99
+        public override int AOE { get { return 3; } }//please Set between 1-99 NpC in range for Cleave if not desired set to 99
         public override int SINGLE {get { return 1; } }//please Set between 1-99 NpC in range for ST if not desired set to 99       
 
         public override void Pulse()

@@ -222,6 +222,7 @@ private float FocusTimetoMax
 		
         public override void Initialize()
         {
+			Log.Write("Auto AoE optimized for WQs", Color.Green);	
            
 			if (ConfigFile.ReadValue("Hunter", "AspectoftheTurtle Percent") == "")
             {

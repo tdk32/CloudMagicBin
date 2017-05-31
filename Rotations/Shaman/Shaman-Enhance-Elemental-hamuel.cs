@@ -110,6 +110,9 @@ namespace CloudMagic.Rotation
     }
     public class Enhancement : CombatRoutine
     {
+        public override int CLEAVE { get { return 2; } } //please Set between 1-99 NpC in range for AOE  if not desired set to 99
+        public override int AOE { get { return 3; } }//please Set between 1-99 NpC in range for Cleave if not desired set to 99
+        public override int SINGLE { get { return 1; } }//please Set between 1-99 NpC in range for ST if not desired set to 99
         private static double Revision = 2.3;
         private static int EnhLowHp = 40;
         private static int interMin = 50;

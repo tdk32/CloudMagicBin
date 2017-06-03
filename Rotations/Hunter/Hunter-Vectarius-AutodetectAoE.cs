@@ -2594,7 +2594,7 @@ Aura,201081,tactics
 
 
 Spell,204147,Windburst,D2
-Spell,19434,AS,D4
+Spell,19434,AS,D9
 Spell,185358,Arcane Shot,D5
 Spell,185901,Marked Shot,D6
 Spell,186387,Bursting Shot,D7

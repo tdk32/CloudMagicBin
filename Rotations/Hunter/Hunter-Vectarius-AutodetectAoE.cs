@@ -62,14 +62,29 @@ private float FocusRegen
      {
          return (10f* (1f + (WoW.HastePercent / 100f)));
      }
-}	
+}
+private float FocusRegenAotW
+{
+     get
+     {
+         return ((10f* (1f + (WoW.HastePercent / 100f)))+10);
+     }
+}		
 private float FocusTimetoMax
 {
      get
      {
          return ((120f - WoW.Focus) /(10f* (1f + (WoW.HastePercent / 100f)))) *100f;
      }
-}	
+}
+
+private float FocusTimetoMaxAotW
+{
+     get
+     {
+         return ((120f - WoW.Focus) /((10f* (1f + (WoW.HastePercent / 100f)))+10)) *100f;
+     }
+}
 
 		//Pet Control	
 		private CheckBox HealPetBox;
@@ -928,6 +943,18 @@ if(WoW.PlayerSpec == "Beast Mastery")
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus > 32 || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 25))&& (WoW.SpellCooldownTimeRemaining("Kill Command") > (FocusTimetoMaxAotW)) && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") > (FocusTimetoMaxAotW))&& WoW.PlayerHasBuff("Aspect of the Wild")
+						
+						&& WoW.IsSpellInRange("Cobra Shot"))
+                    {			
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }
+					if (WoW.CanCast("Cobra Shot") && (WoW.Focus > 32 || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 25))&& WoW.PlayerHasBuff("Bestial Wrath") && ((FocusRegenAotW*WoW.SpellCooldownTimeRemaining("Kill Command")) > 300) && WoW.IsSpellInRange("Cobra Shot") && WoW.PlayerHasBuff("Aspect of the Wild"))
+                    {					
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }					
                 }
             }
 
@@ -1044,6 +1071,18 @@ if(WoW.PlayerSpec == "Beast Mastery")
                         WoW.CastSpell("Cobra Shot");
                         return;
                     }
+					if (WoW.CanCast("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD&& ((WoW.Focus > 72-FocusRegenAotW) || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 59-FocusRegenAotW))&& (WoW.SpellCooldownTimeRemaining("Kill Command") > (FocusTimetoMaxAotW)) && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") > (FocusTimetoMaxAotW))&& WoW.PlayerHasBuff("Aspect of the Wild")
+						
+						&& WoW.IsSpellInRange("Cobra Shot"))
+                    {			
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }
+					if (WoW.CanCast("Cobra Shot") && WoW.PetHasBuff("Beast Cleave") && WoW.PetBuffTimeRemaining("Beast Cleave") > GCD&& ((WoW.Focus > 72-FocusRegenAotW) || (WoW.PlayerHasBuff("Roar of the Seven Lions") && WoW.Focus >= 59-FocusRegenAotW))&& WoW.PlayerHasBuff("Bestial Wrath") && ((FocusRegenAotW*WoW.SpellCooldownTimeRemaining("Kill Command")) > 300) && WoW.IsSpellInRange("Cobra Shot") && WoW.PlayerHasBuff("Aspect of the Wild"))
+                    {					
+                        WoW.CastSpell("Cobra Shot");
+                        return;
+                    }					
 					if (WoW.CanCast("Cobra Shot") && WoW.Level <= 39 && WoW.Focus > 40  
 						
 						&& WoW.IsSpellInRange("Cobra Shot"))
@@ -1923,7 +1962,7 @@ if(WoW.PlayerSpec == "Beast Mastery")
                         return;
                     }	
 						
-						if (WoW.TargetHasDebuff("Vulnerable") // AimedShot if HasBuff(LockAndLoad) and HasBuff(Vulnerable)
+						if (WoW.TargetHasDebuff("Vulnerable")   // AimedShot if HasBuff(LockAndLoad) and HasBuff(Vulnerable)
 						&& WoW.PlayerHasBuff("Lock and Load")
 						&& WoW.CanCast("AS") 
 						&& WoW.IsSpellInRange("Windburst") 
@@ -2236,11 +2275,7 @@ if(WoW.PlayerSpec == "Beast Mastery")
 					    WoW.CastSpell("Marked Shot");
                         return;
 					}						
-/* 					if (WoW.CanCast("Windburst") 
-						&& !WoW.IsMoving
-						&& WoW.Focus >= 20 
-						&& WoW.TargetHasDebuff("Vulnerable") 
-						&& !WoW.PlayerIsChanneling
+/* 					if (WoW.CanCast("Windburst") 						&& !WoW.IsMoving						&& WoW.Focus >= 20 						&& WoW.TargetHasDebuff("Vulnerable") 						&& !WoW.PlayerIsChanneling
 						&& !WoW.PlayerIsCasting						
 						&& (WoW.TargetDebuffTimeRemaining("Vulnerable") <= 1)						
 						&& WoW.IsSpellInRange("Windburst"))
@@ -2546,28 +2581,6 @@ Spell,26297,Berserking,F3
 Spell,201430,Stampede,C
 Spell,24394,Intimidation,None
 Spell,142117,Pot,NumPad1
-Aura,217200,Dire Frenzy
-Aura,186265,AspectoftheTurtle
-Aura,136,Heal Pet
-Aura,11196,Bandaged
-Aura,234143,Temptation
-Aura,2825,Bloodlust
-Aura,80353,Time Warp
-Aura,90355,Ancient Hysteria
-Aura,160452,Netherwinds
-Aura,146613,Drums
-Aura,32182,Heroism
-Aura,229206,Pot
-Aura,19574,Bestial Wrath
-Aura,118455,Beast Cleave
-Aura,193530,Aspect of the Wild
-Aura,194386,Volley
-Aura,137080,Roar of the Seven Lions
-Item,144259,Kil'jaeden's Burning Wish
-Item,142117,Pot
-Item,5512,Healthstone
-Item,127834,Potion
-
 Spell,190928,Mongoose Bite,D1
 Spell,202800,Flanking Strike,D2
 Spell,185855,Lacerate,D3
@@ -2585,27 +2598,44 @@ Spell,187708,Carve,F7
 Spell,190925,Harpoon,Numpad5
 Spell,162488,Steel Trap,D5
 Spell,201078,Snake Hunter,D0
+Spell,204147,Windburst,D2
+Spell,19434,AS,D4
+Spell,185358,Arcane Shot,D5
+Spell,185901,Marked Shot,D6
+Spell,186387,Bursting Shot,D7
+Spell,198670,Piercing Shot,D1
+Spell,193526,Trueshot,C
+Aura,217200,Dire Frenzy
+Aura,186265,AspectoftheTurtle
+Aura,136,Heal Pet
+Aura,11196,Bandaged
+Aura,234143,Temptation
+Aura,2825,Bloodlust
+Aura,80353,Time Warp
+Aura,90355,Ancient Hysteria
+Aura,160452,Netherwinds
+Aura,146613,Drums
+Aura,32182,Heroism
+Aura,229206,Pot
+Aura,19574,Bestial Wrath
+Aura,118455,Beast Cleave
+Aura,193530,Aspect of the Wild
+Aura,194386,Volley
+Aura,137080,Roar of the Seven Lions
 Aura,190931,Mongoose Fury
 Aura,87935,Serpent Sting
 Aura,185855,Lacerate
 Aura,186289,Aspect of the Eagle
 Aura,194277,Caltrops
 Aura,201081,tactics
-
-
-Spell,204147,Windburst,D2
-Spell,19434,AS,D9
-Spell,185358,Arcane Shot,D5
-Spell,185901,Marked Shot,D6
-Spell,186387,Bursting Shot,D7
-Spell,198670,Piercing Shot,D1
-Spell,193526,Trueshot,C
 Aura,223138,Marking Targets
 Aura,185365,Hunters Mark
 Aura,194594,Lock and Load
 Aura,187131,Vulnerable
 Aura,193526,Trueshot
 Aura,235712,Gyroscopic Stabilization
-
-
+Item,144259,Kil'jaeden's Burning Wish
+Item,142117,Pot
+Item,5512,Healthstone
+Item,127834,Potion
 */

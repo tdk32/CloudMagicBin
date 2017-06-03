@@ -698,7 +698,7 @@ SettingsForm = new Form {Text = "Beast Mastery Hunter", StartPosition = FormStar
 
         public override void Pulse()
         {
-Log.Write("Current Ingame Spec" + WoW.PlayerSpec, Color.Red);	
+
 		
 		if (DetectKeyPress.GetKeyState(0x6A) < 0)
             {
@@ -883,7 +883,7 @@ if(WoW.PlayerSpec == "Beast Mastery")
                         return;
                     }									
 //dire_frenzy,if=(cooldown.bestial_wrath.remains>6&(!equipped.the_mantle_of_command|pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2))
-					if (WoW.CanCast("Dire Frenzy") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >600 &&(WoW.Legendary(1) != 3 || WoW.PetBuffTimeRemaining("Dire Frenzy") <= 70)) && WoW.Talent(2) == 2 && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Dire Frenzy") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >600 &&(WoW.Legendary(1) != 3 || WoW.PetBuffTimeRemaining("Dire Frenzy") <= GCD*1.5)) && WoW.Talent(2) == 2 && WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Dire Frenzy");
                         return;
@@ -1018,7 +1018,7 @@ if(WoW.PlayerSpec == "Beast Mastery")
                         return;
                     }									
 //dire_frenzy,if=(cooldown.bestial_wrath.remains>6&(!equipped.the_mantle_of_command|pet.cat.buff.dire_frenzy.remains<=gcd.max*1.2))
-					if (WoW.CanCast("Dire Frenzy") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >600 &&(WoW.Legendary(1) != 3 || WoW.PetBuffTimeRemaining("Dire Frenzy") <= 70)) && WoW.Talent(2) == 2 && WoW.IsSpellInRange("Cobra Shot"))
+					if (WoW.CanCast("Dire Frenzy") && (WoW.SpellCooldownTimeRemaining("Bestial Wrath") >600 &&(WoW.Legendary(1) != 3 || WoW.PetBuffTimeRemaining("Dire Frenzy") <= GCD*1.5)) && WoW.Talent(2) == 2 && WoW.IsSpellInRange("Cobra Shot"))
                     {
                         WoW.CastSpell("Dire Frenzy");
                         return;

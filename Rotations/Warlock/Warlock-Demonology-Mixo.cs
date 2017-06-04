@@ -130,10 +130,20 @@ namespace CloudMagic.Rotation
 
         public override Form SettingsForm { get; set; }
 
-        public override string Name => "Demonology Warlock";
+      public override string Name
+        {
+            get { return "Warlock Demonology"; }
+        }
 
-        public override string Class => "Warlock";
-
+        
+		 public override string Class
+        {
+            get { return "Warlock"; }
+        }
+        private static bool lastNamePlate = true;
+		public override int CLEAVE { get { return 99; } } //please Set between 1-99 NpC in range for AOE  if not desired set to 99
+        public override int AOE { get { return 3; } }//please Set between 1-99 NpC in range for Cleave if not desired set to 99
+        public override int SINGLE {get { return 1; } }//please Set between 1-99 NpC in range for ST if not desired set to 99  
         public override void Initialize()
         {
             Log.Write("-----", Color.DarkViolet);

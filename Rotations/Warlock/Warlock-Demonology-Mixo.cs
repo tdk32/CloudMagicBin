@@ -354,14 +354,15 @@ namespace CloudMagic.Rotation
                     Log.Write("Imp Time: " + ImpsRemainingDuration, Color.DarkViolet);
                     Log.Write("Dread Time: " + DreadstalkersRemainingDuration, Color.DarkViolet);
                     //Implosion (if talent)
-                    if (WoW.CanCast("Implosion") && Implosion && WoW.IsSpellInRange("Doom"))
+                    if (WoW.CanCast("Implosion") && WoW.Talent(2) == 3 && WoW.IsSpellInRange("Doom"))
                     {
-                        if (ImpsRemainingDuration <= SBExecuteTime && WoW.PlayerHasBuff("DemonicSynergy"))
+ //                       if (ImpsRemainingDuration <= SBExecuteTime && WoW.PlayerHasBuff("DemonicSynergy"))
+						if (WoW.PlayerHasBuff("DemonicSynergy"))
                         {
                             WoW.CastSpell("Implosion");
                             return;
                         }
-                        if (WoW.LastSpell == "HandOfGuldan" && WoW.WildImpsCount == 1 && WoW.PlayerHasBuff("DemonicSynergy"))
+                        if (WoW.WildImpsCount == 1 && WoW.PlayerHasBuff("DemonicSynergy"))
                         {
                             WoW.CastSpell("Implosion");
                             return;
@@ -377,7 +378,7 @@ namespace CloudMagic.Rotation
                     }
 
                     //Service Pet (if talent)
-                    if (WoW.CanCast("GrimoireFelguard") && GrimoireOfService && WoW.IsSpellInRange("Doom") && WoW.CurrentSoulShards >= 1 && boss)
+                    if (WoW.CanCast("GrimoireFelguard") && UseCooldowns && GrimoireOfService && WoW.IsSpellInRange("Doom") && WoW.CurrentSoulShards >= 1 && UseCooldowns)
                     {
                         WoW.CastSpell("GrimoireFelguard");
                         empowered = false;
@@ -385,7 +386,7 @@ namespace CloudMagic.Rotation
                     }
 
                     // Doomguard
-                    if (WoW.CanCast("Doomguard") && WoW.CurrentSoulShards >= 1 && boss && WoW.IsSpellInRange("Doom"))
+                    if (WoW.CanCast("Doomguard") && WoW.CurrentSoulShards >= 1 && UseCooldowns && WoW.IsSpellInRange("Doom"))
                     {
                         WoW.CastSpell("Doomguard");
                         empowered = false;
@@ -547,13 +548,18 @@ namespace CloudMagic.Rotation
                     }
 
                     //Thal'kiel's Consumption
-                    if (WoW.CanCast("TK") && WoW.DreadstalkersCount >= 1 && DreadstalkersRemainingDuration > TwoSecondCast && ((WoW.WildImpsCount >= 1 && !threeimps) || WoW.WildImpsCount >= 2) &&
+ /*                   if (WoW.CanCast("TK") && WoW.DreadstalkersCount >= 1 && DreadstalkersRemainingDuration > TwoSecondCast && ((WoW.WildImpsCount >= 1 && !threeimps) || WoW.WildImpsCount >= 2) &&
                         ImpsRemainingDuration > TwoSecondCast && WoW.IsSpellInRange("Doom") && (!WoW.IsMoving || WoW.PlayerHasBuff("Norgannon")))
                     {
                         WoW.CastSpell("TK");
                         return;
                     }
-
+*/
+					if (WoW.CanCast("TK") && WoW.IsSpellInRange("Doom") && (!WoW.IsMoving || WoW.PlayerHasBuff("Norgannon")) && WoW.WasLastCasted("HandOfGuldan"))
+                    {
+                        WoW.CastSpell("TK");
+                        return;
+                    }
                     //Life Tap
                     if (WoW.CanCast("LifeTap") && WoW.Mana <= 30)
                     {
@@ -601,7 +607,12 @@ namespace CloudMagic.Rotation
                     //Implosion (if talent)
                     if (WoW.CanCast("Implosion") && Implosion && WoW.IsSpellInRange("Doom"))
                     {
-                        if (ImpsRemainingDuration <= SBExecuteTime && WoW.PlayerHasBuff("DemonicSynergy"))
+ //                       if (ImpsRemainingDuration <= SBExecuteTime && WoW.PlayerHasBuff("DemonicSynergy"))
+						if (WoW.PlayerHasBuff("DemonicSynergy"))
+                        {
+                            WoW.CastSpell("Implosion");
+                            return;
+                        }
                         {
                             WoW.CastSpell("Implosion");
                             return;
@@ -616,7 +627,8 @@ namespace CloudMagic.Rotation
                             WoW.CastSpell("Implosion");
                             return;
                         }
-                        if (WoW.LastSpell == "HandOfGuldan" && WoW.WildImpsCount == 1)
+  //                      if (WoW.LastSpell == "HandOfGuldan" && WoW.WildImpsCount == 1)
+						if (WoW.WasLastCasted("HandOfGuldan"))
                         {
                             WoW.CastSpell("Implosion");
                             return;
@@ -786,14 +798,19 @@ namespace CloudMagic.Rotation
                     }
 
                     //Thal'kiel's Consumption
-                    if (WoW.CanCast("TK") && ((WoW.DreadstalkersCount >= 1 && DreadstalkersRemainingDuration > TwoSecondCast) || Implosion) &&
+/*                    if (WoW.CanCast("TK") && ((WoW.DreadstalkersCount >= 1 && DreadstalkersRemainingDuration > TwoSecondCast) || Implosion) &&
                         ((WoW.WildImpsCount >= 1 && !threeimps) || WoW.WildImpsCount >= 2) && ImpsRemainingDuration > TwoSecondCast && WoW.IsSpellInRange("Doom") &&
                         (!WoW.IsMoving || WoW.PlayerHasBuff("Norgannon")))
                     {
                         WoW.CastSpell("TK");
                         return;
                     }
-
+*/
+					if (WoW.CanCast("TK") && WoW.IsSpellInRange("Doom") && (!WoW.IsMoving || WoW.PlayerHasBuff("Norgannon")) &&WoW.WasLastCasted("HandOfGuldan"))
+                    {
+                        WoW.CastSpell("TK");
+                        return;
+                    }
                     //Life Tap
                     if (WoW.CanCast("LifeTap") && WoW.Mana <= 30)
                     {

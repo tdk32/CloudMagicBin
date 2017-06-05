@@ -1,10 +1,19 @@
-using System;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Timers;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
 using System.Windows.Forms;
 using CloudMagic.Helpers;
+using CloudMagic.GUI;
 
 namespace CloudMagic.Rotation
 {
@@ -285,20 +294,12 @@ namespace CloudMagic.Rotation
                 combatRoutine.ChangeType(RotationType.SingleTargetCleave);
             if (count <= single)
                 combatRoutine.ChangeType(RotationType.SingleTarget);
-
         }
 
-        /*  private void ChangeTarget()
-          {
-              await Task.Run(() =>
-              {
-                  if (PlayerSpec == "Enhancement" && !TargetInfo.Melee)
-                      WoW.KeyPressRelease(WoW.Keys.Tab);
-                  if (PlayerSpec == "Elemental " && !TargetInfo.Range)
-                      WoW.KeyPressRelease(WoW.Keys.Tab);
-              });
-          }*/
-
+        public override int CLEAVE { get { return 99; } }   //please Set between 1-99 NpC in range for AOE  if not desired set to 99
+        public override int AOE { get { return 99; } }      //please Set between 1-99 NpC in range for Cleave if not desired set to 99
+        public override int SINGLE { get { return 99; } }   //please Set between 1-99 NpC in range for ST if not desired set to 99
+                
         private static bool setBonus2Pc
         {
             get
